@@ -1,0 +1,33 @@
+name: FoxyCraft CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Set Java environment
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set Node.js environment
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20'
+
+      - name: Check backend build
+        run: |
+          cd backend
+          ./gradlew bootJar
+
+      - name: Install frontend dependency and check frontend build
+        run: npm install && npm run build-react

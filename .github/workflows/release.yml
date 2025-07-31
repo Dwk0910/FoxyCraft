@@ -1,0 +1,49 @@
+name: build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Set Java environment
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set Node.js environment
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20'
+
+      - name: Build backend
+        run: |
+          cd backend
+          ./gradlew bootJar
+
+      - name: Install frontend dependency
+        run: npm install
+
+      - name: Electron app build * packaging
+        run: npm run build
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Create Github Releases and upload artifacts
+        uses: 'softprops/action-gh-release@v1'
+        with:
+          files: "release/*.exe,release/*.dmg,release/*.AppImage"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -12,6 +12,7 @@
     "dev": "concurrently --raw \"npm run start-react\" \"npm run start-electron\""
   },
   "dependencies": {
+    "jquery": "^3.7.1",
     "lucide-react": "^0.535.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{yy-mm-dd HH:mm:ss}] [%c{1}#%t/%-level]: %msg%n"/>
+        </Console>
+        <File name="file" fileName="backend_launcher.log" append="false">
+            <PatternLayout pattern="[%d{yy-mm-dd HH:mm:ss}] [%c{1}#%t/%-level]: %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+        </Root>
+    </Loggers>
+</Configuration>

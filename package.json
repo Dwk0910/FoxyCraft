@@ -1,32 +1,50 @@
 {
-  "name": "minepanel",
-  "version": "1.0.0",
+  "name": "foxycraft",
+  "author": "neatore",
+  "version": "0.0.1",
+  "description": "FoxyCraft helps you create, configure, and run your own Minecraft server with a powerful and user-friendly interface.",
   "main": "main.js",
   "scripts": {
-    "react-start": "react-scripts start",
-    "electron-start": "electron .",
-    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-start\""
+    "start-react": "vite",
+    "build-react": "vite build",
+    "start-electron": "electron .",
+    "build": "npm run build-react && electron-builder",
+    "dev": "concurrently --raw \"npm run start-react\" \"npm run start-electron\""
   },
   "dependencies": {
+    "jquery": "^3.7.1",
+    "lucide-react": "^0.535.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
     "concurrently": "^9.2.0",
     "electron": "^37.2.5",
-    "electron-is-dev": "^3.0.1",
-    "jquery": "^3.7.1",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-scripts": "5.0.1",
-    "wait-on": "^8.0.4"
+    "electron-builder": "^26.0.12",
+    "vite": "^7.0.6"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+  "build": {
+    "appId": "org.foxycraft",
+    "productName": "FoxyCraft",
+    "files": [
+      "dist/**/*",
+      "main.js"
     ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "msi",
+      "icon": "icon.ico"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "mac": {
+      "target": "dmg"
+    }
   }
 }

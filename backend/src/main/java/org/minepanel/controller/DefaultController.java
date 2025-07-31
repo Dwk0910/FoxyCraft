@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @CrossOrigin(
-        origins = "http://localhost:3000",
+        origins = "http://localhost:5173",
         methods = RequestMethod.POST
 )
 @RestController

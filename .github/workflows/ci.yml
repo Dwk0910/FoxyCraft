@@ -3,7 +3,8 @@ name: FoxyCraft CI
 on:
   pull_request:
     branches:
-      - main
+      - Development
+      - master
 
 jobs:
   build-check:

@@ -28,6 +28,7 @@ jobs:
       - name: Check backend build
         run: |
           cd backend
+          chmod +x gradlew
           ./gradlew bootJar
 
       - name: Install frontend dependency and check frontend build

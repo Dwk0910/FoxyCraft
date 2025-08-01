@@ -12,6 +12,7 @@
     "dev": "concurrently --raw \"npm run start-react\" \"npm run start-electron\""
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.11",
     "jquery": "^3.7.1",
     "lucide-react": "^0.535.0",
     "react": "^19.1.1",
@@ -21,9 +22,11 @@
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "@tailwindcss/vite": "^4.1.11",
     "concurrently": "^9.2.0",
     "electron": "^37.2.5",
     "electron-builder": "^26.0.12",
+    "tailwindcss": "^4.1.11",
     "vite": "^7.0.6"
   },
   "build": {

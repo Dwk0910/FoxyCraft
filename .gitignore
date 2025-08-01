@@ -64,3 +64,4 @@ bin/
 
 ### VS Code ###
 .vscode/
+/release

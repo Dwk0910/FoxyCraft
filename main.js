@@ -11,7 +11,7 @@ function createWindow() {
         }
     });
 
-    window.setResizable(false);
+    // window.setResizable(false);
     window.setMenu(null);
 
     if (app.isPackaged) {

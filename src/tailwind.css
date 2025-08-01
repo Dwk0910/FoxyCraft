@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@font-face {
+    font-family: "SeoulNamsanM";
+    src: url("./assets/fonts/SeoulNamsanM.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SeoulNamsanB";
+    src: url("./assets/fonts/SeoulNamsanB.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@theme {
+    --font-SeoulNamsanM: "SeoulNamsanM", "monospace";
+    --font-SeoulNamsanB: "SeoulNamsanB", "monospace";
+}

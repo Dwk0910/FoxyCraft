@@ -25,6 +25,7 @@ public class FoxyCraft {
         do {
             if (port > 3010) {
                 logger.error("사용 가능한 포트의 범위를 초과했습니다. {}", port);
+                System.exit(-1);
             }
 
             // 비어있는 포트 구하기

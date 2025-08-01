@@ -14,21 +14,7 @@
     font-style: normal;
 }
 
-@font-face {
-    font-family: "suite";
-    src: url("./assets/fonts/Suite-Regular.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-}
-
 @theme {
     --font-SeoulNamsanM: "SeoulNamsanM", "monospace";
     --font-SeoulNamsanB: "SeoulNamsanB", "monospace";
-    --font-suite: "suite", "nonospace";
-}
-
-html, body {
-    color: white;
-    background-color: #333333;
-    user-select: none;
 }

@@ -1,34 +1,25 @@
 
-import { useNavigate, useLocation } from "react-router-dom";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { useContext } from "react";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { FiPlus } from "react-icons/fi";
+import { MenuContext } from "../App";
+
+import AddServer from "./AddServer";
 
 export default function Main() {
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    console.log(location.pathname);
-
+    const { changeMenu } = useContext(MenuContext);
     return (
-        <div className="flex flex-row min-h-screen">
-            <div
-                className="
-                group/sidebar
-                flex fixed flex-col transition-[width] duration-300 ease-in-out w-20 bg-gray-700 border-r-2 border-gray-600 min-h-full items-start overflow-hidden pt-2
-                hover:w-60
-                ">
-                <header className={"flex flex-col items-center cursor-pointer border-white w-full"} onClick={() => navigate("/test")}>
-                    <span className={"flex flex-row w-full items-center"}>
-                        <img src="/assets/images/icon.png" className="h-14 ml-[11.5px]" alt="logo"/>
-                        <span className={"text-3xl text-gray-300 ml-3 font-suite opacity-0 group-hover/sidebar:opacity-100 duration-300 ease-in-out"}>FoxyCraft</span>
-                    </span>
-                </header>
-                <nav className={"group/nav hover:bg-gray-600 transition-colors flex flex-row mt-10 w-full min-h-14 items-center overflow-hidden text-nowrap cursor-pointer " + ((location.pathname === "/") ? "bg-gray-600" : "")}>
-                    <span className={"text-[1.7rem] ml-[26px]"}><MdOutlineSpaceDashboard/></span>
-                    <span className={"transition-opacity font-SeoulNamsanB size-[1.5rem] mt-[3px] ml-4 w-full opacity-0 group-hover/sidebar:opacity-100"}>대시보드</span>
-                </nav>
-            </div>
-            <div className={"ml-21"}>
-                Section:MAIN
+        <div className={"flex min-h-screen flex-col p-5"}>
+            <div className={"flex flex-col justify-center items-center flex-grow"}>
+                <img src={"../../assets/images/icon.png"} alt={"bigicon"} className={"h-50"}/>
+                <span className={"h-5 text-2xl font-bold font-SeoulNamsanB"}>안녕하세요!</span>
+                <span className={"text-[1rem] mt-3 font-suite text-gray-300"}>
+                    나만의 마인크래프트 서버를 열고 강력히 관리해보세요.
+                </span>
+                <div className={"flex flex-row mt-5"}>
+                    <span className={"flex flex-row items-center transition-colors duration-150 ease-in-out bg-white hover:bg-gray-200 border-1 border-gray-400 text-gray-700 font-SeoulNamsanM text-[0.9rem] p-2 rounded-[5px] cursor-pointer"}><IoDocumentTextOutline className={"mb-1 mr-1"}/>튜토리얼 보기</span>
+                    <span className={"flex flex-row items-center transition-colors duration-150 ease-in-out bg-orange-400 hover:bg-orange-500 text-white font-SeoulNamsanM text-[0.9rem] p-2 rounded-[5px] ml-3 cursor-pointer"} onClick={() => {changeMenu(<AddServer/>)}}><FiPlus className={"mb-1 mr-1"}/>서버 생성하기</span>
+                </div>
             </div>
         </div>
     );

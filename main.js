@@ -31,12 +31,9 @@ app.on('ready', () => {
     let javaExecutable = "";
 
     if (app.isPackaged) {
-        if (process.platform === "win32") javaExecutable = path.join(process.resourcesPath, "jar_win", "bin", "java.exe");
-        else if (process.platform === "darwin") {
-            // macOS handle: 아키텍쳐에 따라 구분이 필요함
-            if (process.arch === "arm64") javaExecutable = path.join(process.resourcesPath, "jar_mac_arm64", "bin", "java"); // Apple Slicon
-            else if (process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jar_mac_x64", "bin", "java"); // Intel Mac
-        } else {
+        if (process.platform === "win32" && process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jar_win_64", "bin", "java.exe");
+        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jar_mac", "Contents", "Home", "bin", "java");
+        else {
             // 지원하지 않는 OS/Architecture
             dialog.showMessageBoxSync({
                 type: "error",

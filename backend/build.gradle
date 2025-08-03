@@ -22,6 +22,18 @@ run {
     mainClass = 'org.foxycraft.FoxyCraft'
 }
 
+// 파일 옮기기 task (packaging에서 사용)
+tasks.register("copyBootJar", Copy) {
+    dependsOn tasks.named('bootJar')
+    from(file("$rootDir/build/libs/"))
+    include("*.jar")
+    into(file("$rootDir/../resources/"))
+}
+
+tasks.named('bootJar') {
+    it.finalizedBy(tasks.named("copyBootJar"))
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)

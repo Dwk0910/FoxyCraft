@@ -1,5 +1,5 @@
 const { app, dialog, BrowserWindow } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const path = require('path');
 
 function createWindow() {
@@ -49,13 +49,23 @@ app.on('ready', () => {
         javaProcess = spawn(javaExecutable, ["-jar", jarPath]);
     } else {
         // 개발 모드에서는 gradlew run 사용
-        javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
+
+        // mac에서는 gradlew
+        if (process.platform === "darwin") {
+            javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
+        }
+        // win에서는 gradlew.bat (새 창에 실행하여 로그 볼 수 있도록 하기)
+        else if (process.platform === "win32") {
+            exec("cmd /c start cmd.exe /c \"cd backend && .\\gradlew.bat bootRun\"");
+        }
     }
 
-    // console에 springboot app log출력
-    javaProcess.stdout.on('data', (data) => console.log(`${data}`));
-    javaProcess.stderr.on('data', (data) => console.log(`${data}`));
-    javaProcess.on('close', (code) => {
+    // console에 springboot app log출력 (mac)
+    javaProcess?.stdout.setEncoding('utf8');
+    javaProcess?.stdout.on('data', (data) => console.log(`${data}`)).setEncoding('utf8');
+    javaProcess?.stderr.on('data', (data) => console.log(`${data}`)).setEncoding('utf8');
+    javaProcess?.on('error', (err) => console.log(`${err}`));
+    javaProcess?.on('close', (code) => {
         if (code !== 0) {
             dialog.showMessageBoxSync({
                 type: "error",
@@ -69,7 +79,10 @@ app.on('ready', () => {
 
         console.log(`JavaProcess exited with code ${code}`);
     });
-    createWindow();
+
+    setTimeout(() => {
+        createWindow();
+    }, 5000);
 });
 
 app.on('window-all-closed', () => {

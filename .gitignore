@@ -67,3 +67,5 @@ bin/
 
 /release
 package-lock.json
+/resources/jar_mac
+/resources/jar_win_64

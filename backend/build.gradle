@@ -6,7 +6,6 @@ plugins {
 }
 
 group = 'org.foxycraft'
-version = '0.0.1'
 
 repositories {
     mavenCentral()

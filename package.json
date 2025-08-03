@@ -9,7 +9,7 @@
     "build-react": "vite build",
     "start-electron": "electron .",
     "build": "npm run build-react && electron-builder",
-    "dev": "concurrently --raw \"npm run start-react\" \"npm run start-electron\""
+    "dev": "concurrently --kill-others --raw \"npm run start-react\" \"wait-on http-get://localhost:5173/ && npm run start-electron\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
@@ -31,7 +31,8 @@
     "electron": "^37.2.5",
     "electron-builder": "^26.0.12",
     "tailwindcss": "^4.1.11",
-    "vite": "^7.0.6"
+    "vite": "^7.0.6",
+    "wait-on": "^8.0.4"
   },
   "build": {
     "appId": "org.foxycraft",

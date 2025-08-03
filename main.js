@@ -47,17 +47,17 @@ app.on('ready', () => {
             app.quit();
             return;
         }
+
+        console.log(`Starting Springboot App with ${javaExecutable}`);
+        javaProcess = spawn(javaExecutable, ["-jar", jarPath]);
     } else {
-        // 개발 모드에서는 시스템 기본 Java 사용
-        javaExecutable = "java";
+        // 개발 모드에서는 gradlew run 사용
+        javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
     }
 
-    console.log(`Starting Springboot App with ${javaExecutable}`);
-    const javaProcess = spawn(javaExecutable, ["-jar", jarPath]);
-
     // console에 springboot app log출력
-    javaProcess.stdout.on('data', (data) => console.log(`[JAVA] ${data}`));
-    javaProcess.stderr.on('data', (data) => console.log(`[JAVA] ${data}`));
+    javaProcess.stdout.on('data', (data) => console.log(`${data}`));
+    javaProcess.stderr.on('data', (data) => console.log(`${data}`));
     javaProcess.on('close', (code) => {
         if (code !== 0) {
             dialog.showMessageBoxSync({

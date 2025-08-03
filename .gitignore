@@ -64,5 +64,8 @@ bin/
 
 ### VS Code ###
 .vscode/
+
+
 /release
+/resources
 package-lock.json

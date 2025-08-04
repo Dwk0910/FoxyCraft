@@ -1,4 +1,4 @@
-package org.minepanel;
+package org.foxycraft;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.ServerSocket;
@@ -17,6 +18,8 @@ import java.util.List;
 @SpringBootApplication
 public class FoxyCraft {
     public static Logger logger = LogManager.getLogger();
+    public static File serverList = new File(System.getProperty("user.dir") + File.separator + "serverList.dat");
+
     public static void main(String[] args) {
         int port = 3001;
 
@@ -38,7 +41,7 @@ public class FoxyCraft {
             }
         } while (true);
 
-        logger.info("Running springboot with port {}...", port);
+        logger.info("Running springboot in port {}...", port);
 
         List<String> argList = new ArrayList<>(Arrays.asList(args));
         String argument = "--server.port=%d".formatted(port);

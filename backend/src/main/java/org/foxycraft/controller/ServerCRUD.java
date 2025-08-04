@@ -12,13 +12,15 @@ import org.json.JSONObject;
 import org.foxycraft.object.Server;
 import org.foxycraft.Util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-@CrossOrigin( origins = "http://localhost:5173", methods = RequestMethod.POST )
+@CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
 @RestController
 public class ServerCRUD {
     @PostMapping("/create")
-    public UUID create(@RequestBody Server server) {
+    public Map<String, Object> create(@RequestBody Server server) {
         UUID uuid = UUID.randomUUID();
 
         JSONArray serverList = Util.getContent("serverlist.dat", JSONArray.class);
@@ -31,6 +33,10 @@ public class ServerCRUD {
 
         Util.writeToFile("serverlist.dat", serverList);
 
-        return uuid;
+        Map<String, Object> result = new HashMap<>();
+        result.put("ok", true);
+        result.put("uuid", uuid);
+
+        return result;
     }
 }

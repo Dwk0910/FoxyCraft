@@ -6,11 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Writer;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -44,7 +44,6 @@ public class Util {
     public static <T> @NotNull T getContent(String fileName, Class<T> _class) {
         try {
             for (String fname : fileList.keySet()) {
-                FoxyCraft.logger.info(fname);
                 if (fname.equals(fileName)) {
                     return _class.cast(switch (_class.getSimpleName()) {
                         case "File" -> fileList.get(fname);

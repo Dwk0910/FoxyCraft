@@ -20,25 +20,25 @@ public class FoxyCraft {
     public static void main(String[] args) {
         int port = 3001;
 
-        logger.info("포트 찾기를 시작합니다...");
+        logger.info("Started to find free port...");
 
         do {
             if (port > 3010) {
-                logger.error("사용 가능한 포트의 범위를 초과했습니다. {}", port);
+                logger.error("un-free port exceed the range of the usable port. {}", port);
                 System.exit(-1);
             }
 
             // 비어있는 포트 구하기
             try (ServerSocket ignored = new ServerSocket(port)) {
-                logger.info("포트를 찾았습니다 : {}", port);
+                logger.info("Port found : {}", port);
                 break;
             } catch (IOException e) {
-                logger.info("이미 등록된 포트 : {}", port);
+                logger.info("Already registered : {}", port);
                 port++;
             }
         } while (true);
 
-        logger.info("포트 {}로 springboot를 실행합니다...", port);
+        logger.info("Running springboot with port {}...", port);
 
         List<String> argList = new ArrayList<>(Arrays.asList(args));
         String argument = "--server.port=%d".formatted(port);

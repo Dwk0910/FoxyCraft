@@ -8,11 +8,13 @@
     "start-react": "vite",
     "build-react": "vite build",
     "start-electron": "electron .",
-    "build": "npm run build-react && electron-builder",
+    "build": "npm run build-react && electron-builder --dir",
     "dev": "concurrently --kill-others --raw \"npm run start-react\" \"wait-on http-get://localhost:5173/ && npm run start-electron\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
+    "axios": "^1.11.0",
+    "electron-log": "^5.4.2",
     "i18next": "^25.3.2",
     "jquery": "^3.7.1",
     "lucide-react": "^0.535.0",
@@ -39,14 +41,33 @@
     "productName": "FoxyCraft",
     "files": [
       "dist/**/*",
-      "main.js"
+      "resources/**/*",
+      "main.js",
+      "preload.js"
+    ],
+    "extraFiles": [
+      {
+        "from": "resources/jre_mac",
+        "to": "resources/jre_mac",
+        "filter": "**/*"
+      },
+      {
+        "from": "resources/jre_win_64",
+        "to": "resources/jre_win_64",
+        "filter": "**/*"
+      },
+      {
+        "from": "resources/FoxyCraft.jar",
+        "to": "resources/FoxyCraft.jar",
+        "filter": "**/*"
+      }
     ],
     "directories": {
       "output": "release"
     },
     "win": {
       "target": "msi",
-      "icon": "icon.ico"
+      "icon": "icon.png"
     },
     "linux": {
       "target": "AppImage"

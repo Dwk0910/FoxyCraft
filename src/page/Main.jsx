@@ -1,4 +1,6 @@
 
+import icon from '../assets/images/icon.png';
+
 import { useContext } from "react";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { FiPlus } from "react-icons/fi";
@@ -11,7 +13,7 @@ export default function Main() {
     return (
         <div className={"flex min-h-screen flex-col p-5"}>
             <div className={"flex flex-col justify-center items-center flex-grow"}>
-                <img src={"../../assets/images/icon.png"} alt={"bigicon"} className={"h-50"}/>
+                <img src={icon} alt={"bigicon"} className={"h-50"}/>
                 <span className={"h-5 text-2xl font-bold font-SeoulNamsanB"}>안녕하세요!</span>
                 <span className={"text-[1rem] mt-3 font-suite text-gray-300"}>
                     나만의 마인크래프트 서버를 손쉽게 열고, 강력히 관리해보세요.

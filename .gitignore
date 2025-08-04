@@ -69,3 +69,5 @@ bin/
 package-lock.json
 /resources/jar_mac
 /resources/jar_win_64
+/resources/jre_mac
+/resources/jre_win_64

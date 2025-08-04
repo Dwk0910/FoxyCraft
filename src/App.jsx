@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import icon from './assets/images/icon.png';
 
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, useRef, createContext } from 'react';
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { LuServer } from "react-icons/lu";
 import { FiPlus, FiSettings } from "react-icons/fi";
@@ -14,6 +14,8 @@ import AddServer from "./page/AddServer";
 import Settings from './page/Settings';
 
 export default function App() {
+    const isEffectRun = useRef(false);
+
     const [ isLoading, setIsLoading ] = useState(true);
     const [ loadingStatus, setLoadingStatus ] = useState(null);
     const [ currentMenu, setCurrentMenu ] = useState(<Main/>);
@@ -31,6 +33,7 @@ export default function App() {
 
     useEffect(() => {
         const findPort = async () => {
+            if (isEffectRun.current) return;
             localStorage.removeItem('backend');
             for (let i = 0; i < 3; i++) {
                 for (let port = 3001; port <= 3010; port++) {
@@ -62,6 +65,7 @@ export default function App() {
                 localStorage.setItem('backend', '3001');
                 // 나중에 서버 끄기 위해 백엔드 쪽으로 포트 넘기기
                 window.api.sendPortNumber(3001);
+                isEffectRun.current = true;
                 setIsLoading(false);
             }
         }, 0);
@@ -71,10 +75,11 @@ export default function App() {
         }, 5000); // 처음 백엔드 시작 시간 확보
 
         return () => {
+            new Promise(resolve => setTimeout(resolve, 1200)).then();
             clearTimeout(shortcut);
             clearTimeout(initialTimer);
         }
-    });
+    }, []);
 
     if (!isLoading) {
         return (
@@ -83,10 +88,10 @@ export default function App() {
                     <div className={"group/sidebar flex fixed flex-col transition-[width] ease-in-out bg-gray-700 border-r-2 border-gray-600 min-h-full items-start overflow-hidden pt-2 z-1 " + ((isAnimating) ? "w-60" : "duration-300 w-20 hover:w-60")}>
                         <header className={"flex flex-col items-center cursor-pointer border-white w-full mt-2"}
                                 onClick={() => changeMenu(<Main/>)}>
-                    <span className={"flex flex-row w-full items-center"}>
-                        <img src={icon} className="h-12 ml-[15px]" alt="logo"/>
-                        <span className={"text-3xl text-gray-300 ml-3 font-suite opacity-0 group-hover/sidebar:opacity-100 duration-300 ease-in-out"}>FoxyCraft</span>
-                    </span>
+                            <span className={"flex flex-row w-full items-center"}>
+                                <img src={icon} className="h-12 ml-[15px]" alt="logo"/>
+                                <span className={"text-3xl text-gray-300 ml-3 font-suite opacity-0 group-hover/sidebar:opacity-100 duration-300 ease-in-out"}>FoxyCraft</span>
+                            </span>
                         </header>
                         <nav className={"group/nav hover:bg-gray-600 transition-colors flex flex-row mt-10 w-full min-h-14 items-center overflow-hidden text-nowrap cursor-pointer " + ((currentMenu.type.name === "Main") ? "bg-gray-600" : "")}
                              onClick={() => changeMenu(<Main/>)}>
@@ -94,8 +99,8 @@ export default function App() {
                             <span className={"transition-opacity font-SeoulNamsanB size-[1.5rem] mt-[3px] ml-6.5 w-full opacity-0 group-hover/sidebar:opacity-100"}>대시보드</span>
                         </nav>
                         <span className={"w-full h-[1px] border-gray-600 border-t-2 mt-10 pt-2.5 pl-10 text-nowrap"}>
-                    <span className={"font-SeoulNamsanM duration-300 text-gray-400 opacity-0 group-hover/sidebar:opacity-100"}>서버관리</span>
-                </span>
+                            <span className={"font-SeoulNamsanM duration-300 text-gray-400 opacity-0 group-hover/sidebar:opacity-100"}>서버관리</span>
+                        </span>
                         <nav className={"group/nav hover:bg-gray-600 transition-colors flex flex-row mt-8 w-full min-h-14 items-center overflow-hidden text-nowrap cursor-pointer " + ((currentMenu.type.name === "ServerList") ? "bg-gray-600" : "")}
                              onClick={() => changeMenu(<ServerList/>)}>
                             <span className={"text-[1.7rem] ml-[26px]"}><LuServer/></span>
@@ -107,8 +112,8 @@ export default function App() {
                             <span className={"transition-opacity font-SeoulNamsanB size-[1.5rem] mt-[3px] ml-6.5 w-full opacity-0 group-hover/sidebar:opacity-100"}>서버 추가</span>
                         </nav>
                         <span className={"w-full h-[1px] border-gray-600 border-t-2 mt-10 pt-2.5 pl-10 text-nowrap"}>
-                    <span className={"font-SeoulNamsanM duration-300 text-gray-400 opacity-0 group-hover/sidebar:opacity-100"}>기타</span>
-                </span>
+                            <span className={"font-SeoulNamsanM duration-300 text-gray-400 opacity-0 group-hover/sidebar:opacity-100"}>기타</span>
+                        </span>
                         <nav className={"group/nav hover:bg-gray-600 transition-colors mt-8 flex flex-row w-full min-h-14 items-center overflow-hidden text-nowrap cursor-pointer " + ((currentMenu.type.name === "Settings") ? "bg-gray-600" : "")}
                              onClick={() => changeMenu(<Settings/>)}>
                             <span className={"text-[1.7rem] ml-[26px]"}><FiSettings/></span>

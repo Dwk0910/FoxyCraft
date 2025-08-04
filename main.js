@@ -1,6 +1,6 @@
 
 const { app, dialog, ipcMain, BrowserWindow } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 
 const axios = require('axios');
 const log = require('electron-log');
@@ -80,13 +80,9 @@ app.on('ready', () => {
         if (process.platform === "darwin") {
             javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
         }
-        // win에서는 gradlew.bat (새 창에 실행하여 로그 볼 수 있도록 하기)
+        // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            javaProcess = spawn('.\\gradlew.bat', ['bootRun'], {
-                cwd: path.join(__dirname, "backend"),
-                shell: true,
-                detached: false,
-            });
+            exec("cmd /c start cmd.exe /c \"cd backend && .\\gradlew.bat bootRun & exit\"");
         }
     }
 
@@ -125,7 +121,7 @@ async function shutdown() {
             }
         }).then(resp => {
             console.log(resp.data);
-            javaProcess.kill();
+            if (process.platform !== "win32") javaProcess.kill();
         }).catch(err => console.log(err));
     } catch (err) {
         console.log(err);

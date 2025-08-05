@@ -58,15 +58,19 @@ export default function App() {
         }
 
         const shortcut = setTimeout(async () => {
-            // 가장 가능성 높은 3001번 포트 먼저 검사
-            const response = await axios.post("http://localhost:3001/health", {}, {timeout: 1200});
-            if (response.status === 200 && response.data === 'OK') {
-                console.log(`서버를 찾았습니다 : 3001`);
-                localStorage.setItem('backend', '3001');
-                // 나중에 서버 끄기 위해 백엔드 쪽으로 포트 넘기기
-                window.api.sendPortNumber(3001);
-                isEffectRun.current = true;
-                setIsLoading(false);
+            try {
+                // 가장 가능성 높은 3001번 포트 먼저 검사
+                const response = await axios.post("http://localhost:3001/health", {}, {timeout: 1200});
+                if (response.status === 200 && response.data === 'OK') {
+                    console.log(`서버를 찾았습니다 : 3001`);
+                    localStorage.setItem('backend', '3001');
+                    // 나중에 서버 끄기 위해 백엔드 쪽으로 포트 넘기기
+                    window.api.sendPortNumber(3001);
+                    isEffectRun.current = true;
+                    setIsLoading(false);
+                }
+            } catch (err) {
+                console.log("Shortcut 3001 실패... 5초 대기.")
             }
         }, 0);
 
@@ -85,7 +89,7 @@ export default function App() {
         return (
             <MenuContext.Provider value={{ changeMenu }}>
                 <div className="flex flex-row min-h-screen">
-                    <div className={"group/sidebar flex fixed flex-col transition-[width] ease-in-out bg-gray-700 border-r-2 border-gray-600 min-h-full items-start overflow-hidden pt-2 z-1 " + ((isAnimating) ? "w-60" : "duration-300 w-20 hover:w-60")}>
+                    <div className={"group/sidebar flex fixed flex-col transition-[width, shadow] ease-in-out bg-gray-700 border-r-2 border-gray-600 min-h-full items-start overflow-hidden pt-2 z-1 shadow-amber-50 sidebar " + ((isAnimating) ? "w-60" : "duration-300 w-20 hover:w-60")}>
                         <header className={"flex flex-col items-center cursor-pointer border-white w-full mt-2"}
                                 onClick={() => changeMenu(<Main/>)}>
                             <span className={"flex flex-row w-full items-center"}>
@@ -120,7 +124,7 @@ export default function App() {
                             <span className={"transition-opacity font-SeoulNamsanB size-[1.5rem] mt-[3px] ml-6.5 w-full opacity-0 group-hover/sidebar:opacity-100"}>설정</span>
                         </nav>
                     </div>
-                    <div className={"pl-21 min-w-screen min-h-screen transition-opacity duration-150 z-0 " + ((isAnimating) ? "opacity-0" : "opacity-100")} style={{ opacity }}>
+                    <div className={"pl-21 w-full min-h-screen transition-opacity duration-150 z-0 " + ((isAnimating) ? "opacity-0" : "opacity-100")} style={{ opacity }}>
                         {currentMenu}
                     </div>
                 </div>

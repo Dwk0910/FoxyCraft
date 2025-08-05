@@ -13,6 +13,10 @@ import ServerList from './page/ServerList';
 import AddServer from "./page/AddServer";
 import Settings from './page/Settings';
 
+// store
+import { useResetAtom } from 'jotai/utils';
+import { serverAtom } from './jotai/serverAtom';
+
 export default function App() {
     const isEffectRun = useRef(false);
 
@@ -22,8 +26,14 @@ export default function App() {
     const [ isAnimating, setIsAnimating ] = useState(false);
     const [ opacity, setOpacity ] = useState(1);
 
+    const serverAtom_reset = useResetAtom(serverAtom);
+
     const changeMenu = (element) => {
         setOpacity(0);
+
+        // atom reset
+        serverAtom_reset();
+
         setTimeout(() => {
             setCurrentMenu(element);
             setIsAnimating(false);
@@ -60,7 +70,7 @@ export default function App() {
         const shortcut = setTimeout(async () => {
             try {
                 // 가장 가능성 높은 3001번 포트 먼저 검사
-                const response = await axios.post("http://localhost:3001/health", {}, {timeout: 1200});
+                const response = await axios.post("http://localhost:3001/health", {}, { timeout: 1200 });
                 if (response.status === 200 && response.data === 'OK') {
                     console.log(`서버를 찾았습니다 : 3001`);
                     localStorage.setItem('backend', '3001');
@@ -132,7 +142,6 @@ export default function App() {
         );
     } else {
         // 로딩 창 출력
-
         const scaleAnimation = `
         @keyframes scaleAnimation {
             0% { 

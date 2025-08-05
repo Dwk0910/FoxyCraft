@@ -28,16 +28,23 @@ import Header from "../component/Header";
 export default function AddServer() {
     const backendport = localStorage.getItem("backend");
 
+    const summaryPage = (
+        <div>
+            <h1>Hello, World!</h1>
+        </div>
+    );
+
     const formList = [
         <Template/>,
         <SaveLoc/>,
         <PublishSetting/>,
-        <AdditionalSettings/>
+        <AdditionalSettings/>,
+        summaryPage
     ];
 
     const [currentStep, setCurrentStep] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
     const [opacity, setOpacity] = useState(1);
-    const [currentPage, setCurrentPage] = useState(<Template/>);
 
     // 페이지 state
     const [pageStatus, setPageStatus] = useState("full-left");
@@ -45,6 +52,11 @@ export default function AddServer() {
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
+
+    // const [name, setName] = useState("");
+    // const [dir, setDir] = useState("");
+    // const [port, setPort] = useState(25565);
+    // const [additional, setAdditional] = useState({});
 
     return (
         <div className={"flex flex-col min-h-screen"}>
@@ -108,8 +120,9 @@ export default function AddServer() {
                 </ConfigProvider>
                 <div className={"flex flex-col min-h-full flex-4/6"}>
                     <div className={"flex-1 transition-opacity duration-150 "} style={{ opacity }}>
-                        { currentPage }
+                        { formList[currentPage] }
                     </div>
+                    {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
                     <div className={"flex flex-row w-[100%] justify-start pr-20 mt-10 mb-10"}>
                         <div className={"w-[70%] ml-40"}>
                             <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-[#292929]" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
@@ -119,7 +132,7 @@ export default function AddServer() {
                                         if (currentStep === 1) setPageStatus("full-left");
                                         else setPageStatus("center");
                                         setCurrentStep(currentStep - 1);
-                                        setCurrentPage(formList[currentStep - 1]);
+                                        setCurrentPage(currentPage - 1);
                                         setOpacity(1);
                                     }, 150);
                                 }
@@ -129,34 +142,20 @@ export default function AddServer() {
                             </span>
                         </div>
 
-                        {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
                         <div className={"flex justify-end w-[20%]"}>
                             <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={() => {
                                 if (currentStep <= 3) {
-                                    if (currentStep === 3) {
-                                        // Summary
-                                        setOpacity(0);
-                                        setTimeout(() => {
-                                            setCurrentStep(currentStep + 1);
-                                            setCurrentPage(
-                                                <div>
-                                                    <h1>Last</h1>
-                                                </div>
-                                            );
-                                            setPageStatus("full-right");
-                                            setOpacity(1);
-                                        }, 150);
-                                    } else {
-                                        setOpacity(0);
-                                        setTimeout(() => {
-                                            setCurrentPage(formList[currentStep + 1]);
-                                            setCurrentStep(currentStep + 1);
-                                            setPageStatus("center");
-                                            setOpacity(1);
-                                        }, 150);
-                                    }
+                                    setOpacity(0);
+                                    setTimeout(() => {
+                                        setCurrentPage(currentPage + 1);
+                                        setCurrentStep(currentStep + 1);
+                                        if (currentStep === 3) setPageStatus("full-right");
+                                        else setPageStatus("center");
+                                        setOpacity(1);
+                                    }, 150);
                                 } else if (currentStep === 4) {
                                     // 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
+
                                 }
                             }}>
                                 { pageStatus === "full-right" ? "서버 생성" : "다음" }

@@ -29,6 +29,7 @@ public class ServerCRUD {
                 .put("name", server.name())
                 .put("argument", new JSONArray(server.args()))
                 .put("path", server.serverDirectory().toPath())
+                .put("reqJRE", server.reqJRE())
                 .put("port", server.port()));
 
         Util.writeToFile("serverlist.dat", serverList);

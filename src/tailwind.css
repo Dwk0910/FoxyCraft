@@ -55,7 +55,7 @@ html, body {
 
 .form_last_button {
     transition: all .15s ease-in-out;
-    background: linear-gradient(132deg,rgba(0, 61, 37, 1) 0%, rgba(38, 150, 126, 1) 81%, rgba(18, 89, 115, 1) 100%);
+    background: linear-gradient(132deg,rgba(0, 61, 37, 1) 0%, rgba(38, 150, 126, 1) 81%, rgba(0, 61, 37, 1) 100%);
 }
 
 .form_last_button:hover {

@@ -112,7 +112,7 @@ export default function AddServer() {
                     </div>
                     <div className={"flex flex-row w-[100%] justify-start pr-20 mt-10 mb-10"}>
                         <div className={"w-[70%] ml-40"}>
-                            <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-gray-500" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
+                            <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-[#292929]" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
                                 if (currentStep >= 1) {
                                     setOpacity(0);
                                     setTimeout(() => {
@@ -130,7 +130,7 @@ export default function AddServer() {
                         </div>
 
                         {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
-                        <div className={"w-[20%]"}>
+                        <div className={"flex justify-end w-[20%]"}>
                             <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={() => {
                                 if (currentStep <= 3) {
                                     if (currentStep === 3) {

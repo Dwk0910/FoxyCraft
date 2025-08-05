@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 import { Steps, ConfigProvider } from 'antd';
 
+import clsx from "clsx";
+
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 // icons
@@ -36,6 +38,9 @@ export default function AddServer() {
     const [currentStep, setCurrentStep] = useState(0);
     const [opacity, setOpacity] = useState(1);
     const [currentPage, setCurrentPage] = useState(<Template/>);
+
+    // 페이지 state
+    const [pageStatus, setPageStatus] = useState("full-left");
 
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
@@ -105,47 +110,59 @@ export default function AddServer() {
                     <div className={"flex-1 transition-opacity duration-150 "} style={{ opacity }}>
                         { currentPage }
                     </div>
-                    <div className={"flex flex-row w-[100%] space-x-[70%] justify-end pr-20 mt-10 mb-10"}>
-                        <span className={"flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite bg-orange-400 rounded-[7px] cursor-pointer hover:bg-orange-500"} onClick={() => {
-                            if (currentStep >= 1) {
-                                setOpacity(0);
-                                setTimeout(() => {
-                                    setCurrentStep(currentStep - 1);
-                                    setCurrentPage(formList[currentStep - 1]);
-                                    setOpacity(1);
-                                }, 150);
-                            }
-                        }}>
-                            <IoIosArrowBack className={"text-[1.2rem] mt-0.2"}/>
-                            이전
-                        </span>
-                        <span className={"flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite bg-orange-400 rounded-[7px] cursor-pointer hover:bg-orange-500"} onClick={() => {
-                            if (currentStep < 3) {
-                                setOpacity(0);
-                                setTimeout(() => {
-                                    setCurrentPage(formList[currentStep + 1]);
-                                    setCurrentStep(currentStep + 1);
-                                    setOpacity(1);
-                                }, 150);
-                            } else if (currentStep === 3) {
-                                // Summary
-                                setOpacity(0);
-                                setTimeout(() => {
-                                    setCurrentStep(currentStep + 1);
-                                    setCurrentPage(
-                                        <div>
-                                            <h1>Last</h1>
-                                        </div>
-                                    );
-                                    setOpacity(1);
-                                }, 150);
-                            } else if (currentStep === 4) {
-                                // 서버 추가 동작 (toast띄우고 ServerList 페이지로 넘기기)
-                            }
-                        }}>
-                            다음
-                            <IoIosArrowForward className={"text-[1.2rem] mt-0.2"}/>
-                        </span>
+                    <div className={"flex flex-row w-[100%] justify-start pr-20 mt-10 mb-10"}>
+                        <div className={"w-[70%] ml-40"}>
+                            <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-gray-500" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
+                                if (currentStep >= 1) {
+                                    setOpacity(0);
+                                    setTimeout(() => {
+                                        if (currentStep === 1) setPageStatus("full-left");
+                                        else setPageStatus("center");
+                                        setCurrentStep(currentStep - 1);
+                                        setCurrentPage(formList[currentStep - 1]);
+                                        setOpacity(1);
+                                    }, 150);
+                                }
+                            }}>
+                                <IoIosArrowBack className={"text-[1.2rem] mt-0.2"}/>
+                                이전
+                            </span>
+                        </div>
+
+                        {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
+                        <div className={"w-[20%]"}>
+                            <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={() => {
+                                if (currentStep <= 3) {
+                                    if (currentStep === 3) {
+                                        // Summary
+                                        setOpacity(0);
+                                        setTimeout(() => {
+                                            setCurrentStep(currentStep + 1);
+                                            setCurrentPage(
+                                                <div>
+                                                    <h1>Last</h1>
+                                                </div>
+                                            );
+                                            setPageStatus("full-right");
+                                            setOpacity(1);
+                                        }, 150);
+                                    } else {
+                                        setOpacity(0);
+                                        setTimeout(() => {
+                                            setCurrentPage(formList[currentStep + 1]);
+                                            setCurrentStep(currentStep + 1);
+                                            setPageStatus("center");
+                                            setOpacity(1);
+                                        }, 150);
+                                    }
+                                } else if (currentStep === 4) {
+                                    // 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
+                                }
+                            }}>
+                                { pageStatus === "full-right" ? "서버 생성" : "다음" }
+                                <IoIosArrowForward className={"text-[1.2rem] mt-0.2"}/>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

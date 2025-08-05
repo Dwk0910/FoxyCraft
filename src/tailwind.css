@@ -52,3 +52,12 @@ html, body {
 .sidebar:hover {
     box-shadow: 20px 1px 56px 7px rgba(42, 42, 42, 0.76);
 }
+
+.form_last_button {
+    transition: all .15s ease-in-out;
+    background: linear-gradient(132deg,rgba(0, 61, 37, 1) 0%, rgba(38, 150, 126, 1) 81%, rgba(18, 89, 115, 1) 100%);
+}
+
+.form_last_button:hover {
+    box-shadow: -1px 1px 19px 0 rgba(14,62,186,0.75);
+}

@@ -30,8 +30,8 @@ if (fs.existsSync(logFilePath)) {
 
 function createWindow() {
     const window = new BrowserWindow({
-        width: 1280,
-        height: 1000,
+        width: 1260,
+        height: 960,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: true,
@@ -39,7 +39,7 @@ function createWindow() {
         }
     });
 
-    // window.setResizable(false);
+    window.setResizable(false);
     window.setMenu(null);
 
     if (app.isPackaged) {

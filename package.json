@@ -12,11 +12,14 @@
     "dev": "concurrently --kill-others --raw \"npm run start-react\" \"wait-on http-get://localhost:5173/ && npm run start-electron\""
   },
   "dependencies": {
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@tailwindcss/vite": "^4.1.11",
     "antd": "^5.26.7",
     "axios": "^1.11.0",
+    "clsx": "^2.1.1",
     "electron-log": "^5.4.2",
     "i18next": "^25.3.2",
+    "jotai": "^2.13.0",
     "jquery": "^3.7.1",
     "lucide-react": "^0.535.0",
     "react": "^19.1.1",

@@ -7,9 +7,9 @@ import { Steps, ConfigProvider } from 'antd';
 
 import clsx from "clsx";
 
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 // icons
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoSaveOutline, IoCheckmark } from "react-icons/io5";
 import { FiPlus } from "react-icons/fi";
 import { GoRepoTemplate } from "react-icons/go";
@@ -25,8 +25,14 @@ import AdditionalSettings from "./form/AddServer/AdditionalSettings";
 // components
 import Header from "../component/Header";
 
+// atom
+import { useAtom } from 'jotai';
+import { serverAtom } from "../jotai/serverAtom";
+
 export default function AddServer() {
     const backendport = localStorage.getItem("backend");
+
+    const [ server, setServer ] = useAtom(serverAtom);
 
     const summaryPage = (
         <div>
@@ -42,6 +48,20 @@ export default function AddServer() {
         summaryPage
     ];
 
+    const formCheckList = {
+        Template: [
+            [ server.name, server.runner ],
+            [ server.custom_jre, server.custom_runner_path ]
+        ],
+        SaveLoc: [
+            [ server.path ]
+        ],
+        PublishSetting: [
+        ],
+        AdditionalSettings: [
+        ]
+    };
+
     const [currentStep, setCurrentStep] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [opacity, setOpacity] = useState(1);
@@ -52,11 +72,6 @@ export default function AddServer() {
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
-
-    // const [name, setName] = useState("");
-    // const [dir, setDir] = useState("");
-    // const [port, setPort] = useState(25565);
-    // const [additional, setAdditional] = useState({});
 
     return (
         <div className={"flex flex-col min-h-screen"}>
@@ -142,17 +157,56 @@ export default function AddServer() {
                             </span>
                         </div>
 
+                        {/*다음/서버생성 버튼*/}
                         <div className={"flex justify-end w-[20%]"}>
                             <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={() => {
+                                /*
+                                [버튼을 누를 때]
+                                currentStep이 3 이하인가?
+                                    -> 페이지를 넘길 때 필요한 조건이 있는가?
+                                         -> 조건 확인, 통과하였는가?
+                                              -> <페이지 넘기기>
+                                         -> 통과하지 않았는가?
+                                              -> 실패 toast 띄우기
+                                     -> 조건이 없는가?
+                                         -> <페이지 넘기기>
+                                currentPage이 4(마지막 페이지)인가?
+                                     -> <서버 생성>
+                                 */
                                 if (currentStep <= 3) {
-                                    setOpacity(0);
-                                    setTimeout(() => {
-                                        setCurrentPage(currentPage + 1);
-                                        setCurrentStep(currentStep + 1);
-                                        if (currentStep === 3) setPageStatus("full-right");
-                                        else setPageStatus("center");
-                                        setOpacity(1);
-                                    }, 150);
+                                    // 페이지 넘기기 조건 확인
+                                    let isPassed = true;
+                                    if (formCheckList[formList[currentPage].type.name]) {
+                                        // 만약 넘기는 데에 조건이 있다면
+                                        const conditions = formCheckList[formList[currentPage].type.name]; // 2차원 배열
+                                        for (const condition of conditions) {
+                                            // 검사
+                                            condition.forEach(item => {
+                                                if (
+                                                    item === undefined ||
+                                                    item === null ||
+                                                    item === "" ||
+                                                    item === 0
+                                                ) isPassed = false;
+                                            });
+                                            // 어차피 OR게이트이므로 isPassed == true이면 더 이상 검사 할 필요가 없음
+                                            if (isPassed) break;
+                                        }
+                                    }
+
+                                    if (isPassed) {
+                                        setOpacity(0);
+                                        setTimeout(() => {
+                                            setCurrentPage(currentPage + 1);
+                                            setCurrentStep(currentStep + 1);
+                                            if (currentStep === 3) setPageStatus("full-right");
+                                            else setPageStatus("center");
+                                            setOpacity(1);
+                                        }, 150);
+                                    } else {
+                                        // 일부 입력란을 채우지 않음
+                                        toast.error(<span className={"text-suite text-[1rem]"}>입력란을 모두 채워주세요</span>);
+                                    }
                                 } else if (currentStep === 4) {
                                     // 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
 

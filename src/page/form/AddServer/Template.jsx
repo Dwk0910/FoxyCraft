@@ -1,4 +1,6 @@
 
+import $ from 'jquery';
+
 import { toast } from "react-toastify";
 
 // component
@@ -7,12 +9,15 @@ import Form from "../../../component/AddServer/Form";
 
 // icons
 import { FaPaperPlane } from "react-icons/fa";
+import { FiDownload } from "react-icons/fi";
 
 // store
 import { useAtom } from "jotai";
 import { serverAtom } from "../../../jotai/serverAtom";
 
 export default function Template() {
+    const backendport = localStorage.getItem('backend');
+
     const [server, setServer] = useAtom(serverAtom);
     const { Dragger } = Upload;
 
@@ -21,11 +26,10 @@ export default function Template() {
         name: 'jre',
         multiple: false,
         beforeUpload: (file) => {
-            if (file.type !== 'jar') {
-                console.log(file.type);
+            if (file.type !== 'application/java-archive') {
                 toast.error(<span className={"font-suite"}>올바른 구동기 형식이 아닙니다.</span>);
                 return Upload.LIST_IGNORE;
-            } else return true;
+            } else return false;
         }
     };
 
@@ -106,21 +110,81 @@ export default function Template() {
 
     const customForm = (
         <div className={"mt-[15px]"}>
-            <Dragger {...draggerProp}>
+            <Dragger {...draggerProp} fileList={ server.custom_runner_file } onChange={(event) => {
+                let newFileList = [...event.fileList];
+
+                // fileList의 크기가 1보다 큰가? (업로드한 파일의 갯수가 한 개를 초과하는가?)
+                if (newFileList.length > 1) newFileList = newFileList.slice(-1);
+
+                void setServer(prev => ({
+                    ...prev,
+                    custom_runner_file: newFileList
+                }));
+
+                if (newFileList[0]) {
+                    const formData = new FormData();
+                    formData.append("file", newFileList[0].originFileObj);
+
+                    $.ajax({
+                        url: `http://localhost:${backendport}/fileio/upload`,
+                        type: "POST",
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        success: res => {
+                            void setServer(prev => ({
+                                ...prev,
+                                custom_runner_path: res
+                            }));
+                        },
+                        error: err => {
+                            console.error(err);
+                        }
+                    });
+                }
+            }} onRemove={(event) => {
+                if (!event.originFileObj) return;
+
+                const formData = new FormData();
+                formData.append("file", event.originFileObj);
+
+                $.ajax({
+                    url: `http://localhost:${backendport}/fileio/cancel`,
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    error: err => {
+                        console.error(err);
+                    }
+                });
+
+                void setServer(prev => ({
+                    ...prev,
+                    custom_runner_path: ""
+                }));
+            }}>
+                <div className={"flex flex-col justify-center items-center"}>
+                    <FiDownload size={50} className={"text-gray-500"}/>
+                    <span className={"mt-5 font-suite"}>사용할 구동기를 끌어오거나, 눌러서 선택해 주세요.</span>
+                    <span className={"font-suite text-gray-400"}>사용 가능한 확장자: <span className={"font-mono"}>.jar</span></span>
+                </div>
             </Dragger>
+
+            // TODO: jre version selector
         </div>
     );
 
     return (
         <Form title={"서버 기본 설정"}>
             <Input size="large" style={{ height: '50px', width: '750px' }} value={ server.name } onChange={(event) => {
-                setServer({
-                    ...server,
+                void setServer(prev => ({
+                    ...prev,
                     name: event.target.value
-                });
+                }));
             }} placeholder={"서버 이름을 입력해 주세요."}/>
             <div className={"flex flex-row justify-start w-full"}>
-                <div className={"flex flex-col w-full ml-3.5 pl-3 pb-3 pr-3 mr-3.5 mt-4 h-[500px] border-gray-600 border-1 rounded-[5px]"}>
+                <div className={"flex flex-col w-full ml-[3px] pl-3 pb-3 pr-3 mr-3.5 mt-4 h-[500px] border-gray-600 border-1 rounded-[5px]"}>
                     <span className={"font-suite text-[1.1rem] mt-3"}>구동기 설정</span>
                     <div className={"flex flex-row"}>
                         <span className={"font-SeoulNamsanM text-[0.9rem] text-gray-400"}>사용자 지정 구동기</span>
@@ -137,7 +201,7 @@ export default function Template() {
                     <span className={"font-suite text-[1.1rem] mt-3 p-2"}>추천 구동기</span>
                     <div className={"flex flex-col p-2 h-100 overflow-y-auto"}>
                         <div className={"flex flex-col w-[100%] border-gray-600 border-1 p-2 pl-4 pr-4 rounded-[5px] cursor-pointer transition-all duration-150 ease-in-out hover:scale-102"} onClick={() => {
-                            setServer({
+                            void setServer({
                                 ...server,
                                 custom: false,
                                 runner: ['papermc', '1.20.6']
@@ -158,7 +222,7 @@ export default function Template() {
                             </div>
                         </div>
                         <div className={"flex flex-col w-[100%] border-gray-600 border-1 p-2 pl-4 pr-4 rounded-[5px] cursor-pointer transition-all duration-150 ease-in-out hover:scale-102 mt-5"} onClick={() => {
-                            setServer({
+                            void setServer({
                                 ...server,
                                 custom: false,
                                 runner: ['mohist', '1.7.10']

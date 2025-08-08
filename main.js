@@ -28,8 +28,9 @@ if (fs.existsSync(logFilePath)) {
     }
 }
 
+let window;
 function createWindow() {
-    const window = new BrowserWindow({
+    window = new BrowserWindow({
         width: 1260,
         height: 960,
         webPreferences: {

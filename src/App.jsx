@@ -32,7 +32,7 @@ export default function App() {
         setOpacity(0);
 
         // atom reset
-        serverAtom_reset();
+        void serverAtom_reset();
 
         setTimeout(() => {
             setCurrentMenu(element);

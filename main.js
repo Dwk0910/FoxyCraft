@@ -1,23 +1,20 @@
 
-const { app, dialog, ipcMain, BrowserWindow } = require('electron');
-const { spawn, exec } = require('child_process');
-
-const axios = require('axios');
-const log = require('electron-log');
+// default import
 const path = require('path');
+const os = require('os');
 const fs = require('fs');
+
+// electron import
+const log = require('electron-log');
+const { app, dialog, ipcMain, BrowserWindow } = require('electron');
+
+// other
+const { spawn, exec } = require('child_process');
+const axios = require('axios');
+const crypto = require('crypto');
 
 // clear log file
 const logFilePath = log.transports.file.getFile().path;
-
-// 렌더러에서 포트 번호 받기
-let backendPort = 8080;
-let isBackendReady = false;
-
-ipcMain.on('portnumber', (event, port) => {
-    backendPort = port;
-    isBackendReady = true;
-});
 
 if (fs.existsSync(logFilePath)) {
     try {
@@ -51,6 +48,60 @@ function createWindow() {
         window.webContents.openDevTools();
     }
 }
+
+// 올바른 백엔드 서버인지 확인하기 위해 temp폴더에 랜덤값을 적어놓은 파일 저장
+const tempFolder = path.join(os.tmpdir(), 'foxycraft');
+const tokenFile = path.join(tempFolder, 'token.tk');
+// temp 폴더 없으면 새로 생성
+if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder);
+// 토큰 파일 생성 (이미 있으면 Override)
+let token = crypto.randomBytes(32).toString('base64url');
+fs.writeFileSync(tokenFile, token);
+
+// 렌더러에서 포트 번호 받기
+let backendPort = 8080;
+let isBackendReady = false;
+
+ipcMain.on('portnumber', (event, port) => {
+    backendPort = port;
+    isBackendReady = true;
+});
+
+// 폴더가 비어있는지 확인 (렌더러용)
+ipcMain.handle('isempty', async (event, path) => {
+    try {
+        if (path) {
+            const files = fs.readdirSync(path);
+            return files.length === 0;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        return false;
+    }
+});
+
+// 폴더 선택 시스템
+ipcMain.handle('selectfolder', async (event, defaultFolder) => {
+    const result = await dialog.showOpenDialog(window, {
+        properties: ['openDirectory'],
+        defaultPath: defaultFolder
+    });
+
+    try {
+        const files = fs.readdirSync(result.filePaths[0]);
+        if (result.canceled) return { isErr: false, content: null };
+        else if (files.length !== 0) return { isErr: true, content: "비어있는 폴더를 선택해주세요" };
+        else return { isErr: false, content: result.filePaths[0] };
+    } catch (err) {
+        return { isErr: false, content: null }
+    }
+});
+
+// 렌더러로 사용자 홈 폴더 넘기기 (Addserver Step 2에서 사용)
+ipcMain.handle('gethomefoler', () => {
+    return os.homedir();
+});
 
 // run new backend process
 let javaProcess = undefined;

@@ -1,15 +1,17 @@
 
 import $ from 'jquery';
 
-import { toast } from "react-toastify";
+import clsx from 'clsx';
 
 // component
-import { Input, Switch, Cascader, Divider, Upload } from 'antd';
+import { toast } from "react-toastify";
+import { Input, Switch, Cascader, Divider, Dropdown, Upload } from 'antd';
 import Form from "../../../component/AddServer/Form";
 
 // icons
 import { FaPaperPlane } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
+import { IoIosArrowDown } from "react-icons/io";
 
 // store
 import { useAtom } from "jotai";
@@ -24,6 +26,7 @@ export default function Template() {
     // noinspection JSUnusedGlobalSymbols
     const draggerProp = {
         name: 'jre',
+        accept: '.jar',
         multiple: false,
         beforeUpload: (file) => {
             if (file.type !== 'application/java-archive') {
@@ -67,6 +70,20 @@ export default function Template() {
         }
     ];
 
+    const jreOptions = [{
+        key: 1,
+        label: 'JRE 21'
+    }, {
+        key: 2,
+        label: 'JRE 17'
+    }, {
+        key: 3,
+        label: 'JRE 11'
+    }, {
+        key: 4,
+        label: 'JRE 8'
+    }];
+
     function versionRange(start, end) {
         return {
             includes(version) {
@@ -88,91 +105,108 @@ export default function Template() {
     }
 
     function getJVMVersion(runner) {
-        const mcVersion = runner[runner.length - 1];
-        const jvmMap = [
-            { range: ["0.0.0", "1.15.2"], jvm: "JRE 8" },
-            { exact: "1.16.5", jvm: "JRE 11" },
-            { range: ["1.17", "1.20.6"], jvm: "JRE 17" },
-            { range: ["1.21", "1.21.8"], jvm: "JRE 21" }
-        ];
+        try {
+            const mcVersion = runner[runner.length - 1];
+            const jvmMap = [
+                {range: ["0.0.0", "1.15.2"], jvm: "JRE 8"},
+                {exact: "1.16.5", jvm: "JRE 11"},
+                {range: ["1.17", "1.20.6"], jvm: "JRE 17"},
+                {range: ["1.21", "1.21.8"], jvm: "JRE 21"}
+            ];
 
-        for (const rule of jvmMap) {
-            if (rule.exact && mcVersion === rule.exact) {
-                return rule.jvm;
+            for (const rule of jvmMap) {
+                if (rule.exact && mcVersion === rule.exact) {
+                    return rule.jvm;
+                }
+                if (rule.range && versionRange(...rule.range).includes(mcVersion)) {
+                    return rule.jvm;
+                }
             }
-            if (rule.range && versionRange(...rule.range).includes(mcVersion)) {
-                return rule.jvm;
-            }
+        } catch (err) {
+            return null;
         }
 
         return null;
     }
 
+    // noinspection JSUnusedGlobalSymbols
     const customForm = (
-        <div className={"mt-[15px]"}>
-            <Dragger {...draggerProp} fileList={ server.custom_runner_file } onChange={(event) => {
-                let newFileList = [...event.fileList];
+        <>
+            <div className={"mt-[15px]"}>
+                <Dragger {...draggerProp} fileList={ server.custom_runner_file } onChange={(event) => {
+                    let newFileList = [...event.fileList];
 
-                // fileList의 크기가 1보다 큰가? (업로드한 파일의 갯수가 한 개를 초과하는가?)
-                if (newFileList.length > 1) newFileList = newFileList.slice(-1);
+                    // fileList의 크기가 1보다 큰가? (업로드한 파일의 갯수가 한 개를 초과하는가?)
+                    if (newFileList.length > 1) newFileList = newFileList.slice(-1);
 
-                void setServer(prev => ({
-                    ...prev,
-                    custom_runner_file: newFileList
-                }));
+                    void setServer(prev => ({
+                        ...prev,
+                        custom_runner_file: newFileList
+                    }));
 
-                if (newFileList[0]) {
+                    if (newFileList[0]) {
+                        const formData = new FormData();
+                        formData.append("file", newFileList[0].originFileObj);
+
+                        $.ajax({
+                            url: `http://localhost:${backendport}/fileio/upload`,
+                            type: "POST",
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+                            success: res => {
+                                void setServer(prev => ({
+                                    ...prev,
+                                    custom_runner_path: res
+                                }));
+                            },
+                            error: err => {
+                                console.error(err);
+                            }
+                        });
+                    }
+                }} onRemove={(event) => {
+                    if (!event.originFileObj) return;
+
                     const formData = new FormData();
-                    formData.append("file", newFileList[0].originFileObj);
+                    formData.append("file", event.originFileObj);
 
                     $.ajax({
-                        url: `http://localhost:${backendport}/fileio/upload`,
+                        url: `http://localhost:${backendport}/fileio/cancel`,
                         type: "POST",
                         contentType: false,
                         processData: false,
                         data: formData,
-                        success: res => {
-                            void setServer(prev => ({
-                                ...prev,
-                                custom_runner_path: res
-                            }));
-                        },
                         error: err => {
                             console.error(err);
                         }
                     });
-                }
-            }} onRemove={(event) => {
-                if (!event.originFileObj) return;
 
-                const formData = new FormData();
-                formData.append("file", event.originFileObj);
-
-                $.ajax({
-                    url: `http://localhost:${backendport}/fileio/cancel`,
-                    type: "POST",
-                    contentType: false,
-                    processData: false,
-                    data: formData,
-                    error: err => {
-                        console.error(err);
-                    }
-                });
-
-                void setServer(prev => ({
-                    ...prev,
-                    custom_runner_path: ""
-                }));
-            }}>
-                <div className={"flex flex-col justify-center items-center"}>
-                    <FiDownload size={50} className={"text-gray-500"}/>
-                    <span className={"mt-5 font-suite"}>사용할 구동기를 끌어오거나, 눌러서 선택해 주세요.</span>
-                    <span className={"font-suite text-gray-400"}>사용 가능한 확장자: <span className={"font-mono"}>.jar</span></span>
+                    void setServer(prev => ({
+                        ...prev,
+                        custom_runner_path: ""
+                    }));
+                }}>
+                    <div className={"flex flex-col justify-center items-center"}>
+                        <FiDownload size={50} className={"text-gray-500"}/>
+                        <span className={"mt-5 font-suite"}>사용할 구동기를 끌어오거나, 눌러서 선택해 주세요.</span>
+                        <span className={"font-suite text-gray-400"}>사용 가능한 확장자: <span className={"font-mono"}>.jar</span></span>
+                    </div>
+                </Dragger>
+            </div>
+            <Dropdown menu={{ items: jreOptions, selectable: true, onClick: e => {
+                    // onClick event handle
+                    void setServer(prev => ({
+                        ...prev,
+                        custom_jre: jreOptions[parseInt(e.key) - 1].label
+                    }));
+            }}} trigger={["click"]}>
+                <div className={clsx("flex flex-row justify-between items-center w-full p-2 pl-3.5 mt-3 bg-[#404040] border-1 border-gray-500 rounded-[5px] cursor-pointer transition-all ease-in-out duration-200 hover:border-[#FF8904]", server.custom_runner_path && "mt-10")}>
+                    { server.custom_jre ? server.custom_jre : (<span className={"font-suite text-gray-400"}>구동기 JRE 버전을 선택해 주세요</span>) }
+                    <IoIosArrowDown className={"text-gray-400"}/>
                 </div>
-            </Dragger>
-
-            // TODO: jre version selector
-        </div>
+            </Dropdown>
+        </>
     );
 
     return (

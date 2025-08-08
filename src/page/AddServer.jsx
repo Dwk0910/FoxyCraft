@@ -51,7 +51,7 @@ export default function AddServer() {
     const formCheckList = {
         Template: [
             [ server.name, server.runner, !server.custom ],
-            [ server.custom_jre, server.custom_runner_path ]
+            [ server.name, server.custom_jre, server.custom_runner_path ]
         ],
         SaveLoc: [
             [ server.path ]
@@ -180,9 +180,9 @@ export default function AddServer() {
                                         // 만약 넘기는 데에 조건이 있다면
                                         const conditions = formCheckList[formList[currentPage].type.name]; // 2차원 배열
                                         for (const condition of conditions) {
+                                            isPassed = true;
                                             // 검사
                                             condition.forEach(item => {
-                                                console.log(item);
                                                 if (
                                                     item === undefined ||
                                                     item === null ||
@@ -191,8 +191,8 @@ export default function AddServer() {
                                                     item === false
                                                 ) isPassed = false;
                                             });
+
                                             // 어차피 OR게이트이므로 isPassed == true이면 더 이상 검사 할 필요가 없음
-                                            console.log(isPassed);
                                             if (isPassed) break;
                                         }
                                     }

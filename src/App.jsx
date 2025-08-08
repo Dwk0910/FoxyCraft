@@ -14,6 +14,7 @@ import AddServer from "./page/AddServer";
 import Settings from './page/Settings';
 
 // store
+import { useAtom } from 'jotai';
 import { useResetAtom } from 'jotai/utils';
 import { serverAtom } from './jotai/serverAtom';
 
@@ -27,11 +28,17 @@ export default function App() {
     const [ opacity, setOpacity ] = useState(1);
 
     const serverAtom_reset = useResetAtom(serverAtom);
+    const [server, setServer] = useAtom(serverAtom);
 
     const changeMenu = (element) => {
         setOpacity(0);
 
         // atom reset
+        void setServer({
+            ...server,
+            custom: false
+        });
+
         void serverAtom_reset();
 
         setTimeout(() => {

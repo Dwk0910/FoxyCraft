@@ -24,7 +24,9 @@ export default function SaveLoc() {
                     }
                 }} value={"폴더 선택"}/>
             </div>
-            <span>비어있는 폴더만 선택 가능합니다</span>
+            <div className={"w-full pt-2 pl-0.5"}>
+                <span className={"text-gray-400 font-suite"}>※ 비어있는 폴더만 선택 가능합니다</span>
+            </div>
         </Form>
     );
 }

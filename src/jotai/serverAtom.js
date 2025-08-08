@@ -3,15 +3,29 @@ import $ from 'jquery';
 import { atom } from 'jotai';
 
 const defaultObject = {
-    name: "",
-    path: "",
-    runner: [],
+    // global
     step: 0,
-    port: 25565,
+
+    // template
+    name: "",
     custom: false,
+    runner: [],
     custom_jre: "",
     custom_runner_file: [],
     custom_runner_path: "",
+
+    // saveloc
+    path: "",
+
+    // publish
+    port: 25565,
+    servericon: [],
+    motd: "",
+    servericon_path: "",
+    max_player: 24,
+    online_mode: true,
+
+    // additional
     additional: []
 }
 

@@ -53,6 +53,7 @@ export default function AddServer() {
                 [ server.path, await window.api.isEmpty(server.path) ]
             ],
             PublishSetting: [
+                [ server.port ]
             ],
             AdditionalSettings: [
             ]

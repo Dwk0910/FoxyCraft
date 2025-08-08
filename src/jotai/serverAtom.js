@@ -2,20 +2,29 @@
 import $ from 'jquery';
 import { atom } from 'jotai';
 
-const baseServerAtom = atom({
+const defaultObject = {
     name: "",
     path: "",
     runner: [],
+    step: 0,
     port: 25565,
     custom: false,
     custom_jre: "",
     custom_runner_file: [],
     custom_runner_path: "",
     additional: []
-});
+}
+
+const baseServerAtom = atom(defaultObject);
 
 export const serverAtom = atom(get => get(baseServerAtom), async (get, set, newServer) => {
     const prev = get(baseServerAtom);
+
+    // newServer가 리셋될 경우 (ResetAtom 사용했을 경우)
+    if (typeof newServer === "symbol") {
+        set(baseServerAtom, defaultObject);
+        return;
+    }
 
     // custom이 true에서 false로 바뀐 경우
     try {

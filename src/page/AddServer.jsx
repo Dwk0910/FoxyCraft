@@ -1,12 +1,9 @@
 
-import $ from "jquery";
-
 import { useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 import { Steps, ConfigProvider } from 'antd';
 
 import clsx from "clsx";
-
 
 // icons
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
@@ -30,9 +27,7 @@ import { useAtom } from 'jotai';
 import { serverAtom } from "../jotai/serverAtom";
 
 export default function AddServer() {
-    const backendport = localStorage.getItem("backend");
-
-    const [ server, setServer ] = useAtom(serverAtom);
+    const [server, setServer] = useAtom(serverAtom);
 
     const summaryPage = (
         <div>
@@ -48,25 +43,24 @@ export default function AddServer() {
         summaryPage
     ];
 
-    const formCheckList = {
-        Template: [
-            [ server.name, server.runner, !server.custom ],
-            [ server.name, server.custom_jre, server.custom_runner_path ]
-        ],
-        SaveLoc: [
-            [ server.path ]
-        ],
-        PublishSetting: [
-        ],
-        AdditionalSettings: [
-        ]
+    const getFormCheckList = async () => {
+        return {
+            Template: [
+                [ server.name, server.runner, !server.custom ],
+                [ server.name, server.custom_jre, server.custom_runner_path ]
+            ],
+            SaveLoc: [
+                [ server.path, await window.api.isEmpty(server.path) ]
+            ],
+            PublishSetting: [
+            ],
+            AdditionalSettings: [
+            ]
+        };
     };
 
-    const [currentStep, setCurrentStep] = useState(0);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [opacity, setOpacity] = useState(1);
-
     // 페이지 state
+    const [opacity, setOpacity] = useState(1);
     const [pageStatus, setPageStatus] = useState("full-left");
 
     // Steps에 쓸 style class
@@ -130,24 +124,28 @@ export default function AddServer() {
                                 title: <span className={title}>완료</span>,
                                 icon: <IoCheckmark className={"ml-[3.5px] mt-1"}/>
                             }
-                        ]} current={currentStep}/>
+                        ]} current={server.step}/>
                     </div>
                 </ConfigProvider>
                 <div className={"flex flex-col min-h-full flex-4/6"}>
+                    {/*Form*/}
                     <div className={"flex-1 transition-opacity duration-150 "} style={{ opacity }}>
-                        { formList[currentPage] }
+                        { formList[server.step] }
                     </div>
+                    {/*버튼*/}
                     {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
                     <div className={"flex flex-row w-[100%] justify-start pr-20 mt-10 mb-10"}>
                         <div className={"w-[70%] ml-40"}>
                             <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-[#292929]" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
-                                if (currentStep >= 1) {
+                                if (server.step >= 1) {
                                     setOpacity(0);
                                     setTimeout(() => {
-                                        if (currentStep === 1) setPageStatus("full-left");
+                                        if (server.step === 1) setPageStatus("full-left");
                                         else setPageStatus("center");
-                                        setCurrentStep(currentStep - 1);
-                                        setCurrentPage(currentPage - 1);
+                                        void setServer(prev => ({
+                                            ...prev,
+                                            step: prev.step - 1
+                                        }));
                                         setOpacity(1);
                                     }, 150);
                                 }
@@ -159,7 +157,7 @@ export default function AddServer() {
 
                         {/*다음/서버생성 버튼*/}
                         <div className={"flex justify-end w-[20%]"}>
-                            <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={() => {
+                            <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={ async () => {
                                 /*
                                 [버튼을 누를 때]
                                 currentStep이 3 이하인가?
@@ -173,12 +171,13 @@ export default function AddServer() {
                                 currentPage이 4(마지막 페이지)인가?
                                      -> <서버 생성>
                                  */
-                                if (currentStep <= 3) {
+                                if (server.step <= 3) {
                                     // 페이지 넘기기 조건 확인
                                     let isPassed = true;
-                                    if (formCheckList[formList[currentPage].type.name]) {
+                                    const formCheckList = await getFormCheckList();
+                                    if (formCheckList[formList[server.step].type.name]) {
                                         // 만약 넘기는 데에 조건이 있다면
-                                        const conditions = formCheckList[formList[currentPage].type.name]; // 2차원 배열
+                                        const conditions = formCheckList[formList[server.step].type.name]; // 2차원 배열
                                         for (const condition of conditions) {
                                             isPassed = true;
                                             // 검사
@@ -200,17 +199,19 @@ export default function AddServer() {
                                     if (isPassed) {
                                         setOpacity(0);
                                         setTimeout(() => {
-                                            setCurrentPage(currentPage + 1);
-                                            setCurrentStep(currentStep + 1);
-                                            if (currentStep === 3) setPageStatus("full-right");
+                                            void setServer(prev => ({
+                                                ...prev,
+                                                step: prev.step + 1
+                                            }));
+                                            if (server.step === 3) setPageStatus("full-right");
                                             else setPageStatus("center");
                                             setOpacity(1);
                                         }, 150);
                                     } else {
                                         // 일부 입력란을 채우지 않음
-                                        toast.error(<span className={"text-suite text-[1rem]"}>입력란을 모두 채워주세요</span>);
+                                        toast.error(<span className={"font-suite text-[0.9rem]"}>일부 입력란이 비워져 있거나 잘못되었습니다.</span>);
                                     }
-                                } else if (currentStep === 4) {
+                                } else if (server.step === 4) {
                                     // 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
 
                                 }
@@ -224,7 +225,6 @@ export default function AddServer() {
             </div>
         </div>
     );
-
 
     // $.ajax({
     //     url: `http://localhost:${backendport}/create`,

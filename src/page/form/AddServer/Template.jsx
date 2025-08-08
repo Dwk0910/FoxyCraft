@@ -105,21 +105,25 @@ export default function Template() {
     }
 
     function getJVMVersion(runner) {
-        const mcVersion = runner[runner.length - 1];
-        const jvmMap = [
-            { range: ["0.0.0", "1.15.2"], jvm: "JRE 8" },
-            { exact: "1.16.5", jvm: "JRE 11" },
-            { range: ["1.17", "1.20.6"], jvm: "JRE 17" },
-            { range: ["1.21", "1.21.8"], jvm: "JRE 21" }
-        ];
+        try {
+            const mcVersion = runner[runner.length - 1];
+            const jvmMap = [
+                {range: ["0.0.0", "1.15.2"], jvm: "JRE 8"},
+                {exact: "1.16.5", jvm: "JRE 11"},
+                {range: ["1.17", "1.20.6"], jvm: "JRE 17"},
+                {range: ["1.21", "1.21.8"], jvm: "JRE 21"}
+            ];
 
-        for (const rule of jvmMap) {
-            if (rule.exact && mcVersion === rule.exact) {
-                return rule.jvm;
+            for (const rule of jvmMap) {
+                if (rule.exact && mcVersion === rule.exact) {
+                    return rule.jvm;
+                }
+                if (rule.range && versionRange(...rule.range).includes(mcVersion)) {
+                    return rule.jvm;
+                }
             }
-            if (rule.range && versionRange(...rule.range).includes(mcVersion)) {
-                return rule.jvm;
-            }
+        } catch (err) {
+            return null;
         }
 
         return null;

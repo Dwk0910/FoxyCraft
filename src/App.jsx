@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import icon from './assets/images/icon.png';
 
-import { useState, useEffect, useRef, createContext } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { LuServer } from "react-icons/lu";
 import { FiPlus, FiSettings } from "react-icons/fi";
@@ -19,8 +19,6 @@ import { useResetAtom } from 'jotai/utils';
 import { serverAtom } from './jotai/serverAtom';
 
 export default function App() {
-    const isEffectRun = useRef(false);
-
     const [ isLoading, setIsLoading ] = useState(true);
     const [ loadingStatus, setLoadingStatus ] = useState(null);
     const [ currentMenu, setCurrentMenu ] = useState(<Main/>);
@@ -49,57 +47,47 @@ export default function App() {
     }
 
     useEffect(() => {
-        const findPort = async () => {
-            if (isEffectRun.current) return;
-            localStorage.removeItem('backend');
-            for (let i = 0; i < 3; i++) {
-                for (let port = 3001; port <= 3010; port++) {
-                    try {
-                        if (!isLoading) break;
-                        const url = `http://localhost:${port}/health`;
-                        const response = await axios.post(url, {}, {timeout: 1200});
-                        if (response.status === 200 && response.data === 'OK') {
-                            console.log(`서버를 찾았습니다 : ${port}`);
-                            localStorage.setItem('backend', port.toString());
-                            // 나중에 서버 끄기 위해 백엔드 쪽으로 포트 넘기기
-                            window.api.sendPortNumber(port);
-                            setIsLoading(false);
-                            return;
-                        }
-                    } catch (err) {
-                        console.log(`포트번호 : ${port} 찾을 수 없습니다. 다음 포트를 시도합니다...`);
-                    }
-                }
-            }
-            setLoadingStatus("서버와의 연결에 실패하였습니다.");
-        }
+        const run = async () => {
+            const token = await window.api.getToken();
+            const port = await window.api.getPort();
 
-        const shortcut = setTimeout(async () => {
+            localStorage.setItem("backend", port);
+
             try {
-                // 가장 가능성 높은 3001번 포트 먼저 검사
-                const response = await axios.post("http://localhost:3001/health", {}, { timeout: 1200 });
-                if (response.status === 200 && response.data === 'OK') {
-                    console.log(`서버를 찾았습니다 : 3001`);
-                    localStorage.setItem('backend', '3001');
-                    // 나중에 서버 끄기 위해 백엔드 쪽으로 포트 넘기기
-                    window.api.sendPortNumber(3001);
-                    isEffectRun.current = true;
+                // 1차검사
+                const response = await axios.post(`http://localhost:${port}/health`, {}, { timeout: 1200 });
+                if (response.status === 200 && response.data === token) {
                     setIsLoading(false);
                 }
             } catch (err) {
-                console.log("Shortcut 3001 실패... 5초 대기.")
+                console.log("서버 연결 실패... 재검사 중 (20회)");
             }
-        }, 0);
 
-        const initialTimer = setTimeout(async () => {
-            findPort().then();
-        }, 5000); // 처음 백엔드 시작 시간 확보
+            // 2차검사
+            if (isLoading) {
+                for (let i = 0; i < 20; i++) {
+                    const token = await window.api.getToken();
+                    const port = await window.api.getPort();
 
-        return () => {
-            new Promise(resolve => setTimeout(resolve, 1200)).then();
-            clearTimeout(shortcut);
-            clearTimeout(initialTimer);
-        }
+                    localStorage.setItem("backend", port);
+
+                    try {
+                        const response = await axios.post(`http://localhost:${port}/health`, {}, {timeout: 1200});
+                        await new Promise(resolve => setTimeout(resolve, 1200));
+                        if (response.status === 200 && response.data === token) {
+                            setIsLoading(false);
+                            break;
+                        }
+                    } catch (ignored) {
+                    }
+                }
+            }
+
+            // 서버찾기 실패
+            if (isLoading) setLoadingStatus("서버를 찾을 수 없습니다.");
+        };
+
+        void run();
     }, []);
 
     if (!isLoading) {

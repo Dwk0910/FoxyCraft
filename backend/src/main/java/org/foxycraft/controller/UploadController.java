@@ -18,16 +18,14 @@ import java.io.File;
 import java.io.IOException;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
-@RestController
 @RequestMapping("/fileio")
+@RestController
 public class UploadController {
-    public static String uploadDir = System.getProperty("java.io.tmpdir") + File.separator + "foxycraft";
-
     @PostMapping("/upload")
     public ResponseEntity<String> onUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return ResponseEntity.badRequest().body("File is empty");
         try {
-            File targetFile = new File(uploadDir + File.separator + file.getOriginalFilename());
+            File targetFile = new File(FoxyCraft.tempDir.getPath() + File.separator + file.getOriginalFilename());
             if (!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs()) throw new IOException("Could not create directory");
             file.transferTo(targetFile);
             return ResponseEntity.ok(targetFile.getAbsolutePath());
@@ -41,7 +39,7 @@ public class UploadController {
     public ResponseEntity<String> onCancel(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return ResponseEntity.badRequest().body("File is empty");
         try {
-            File targetFile = new File(uploadDir + File.separator + file.getOriginalFilename());
+            File targetFile = new File(FoxyCraft.tempDir.getPath() + File.separator + file.getOriginalFilename());
             if (!targetFile.exists()) throw new IOException("Parent folder does not exist.");
             if (!targetFile.delete()) throw new IOException("Could not delete file.");
             return ResponseEntity.ok("success");

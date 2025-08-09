@@ -2,9 +2,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    sendPortNumber: (port) => ipcRenderer.send('portnumber', port),
+    getPort: () => ipcRenderer.invoke('getport'),
     selectFoler: (defaultFolder) => ipcRenderer.invoke('selectfolder', defaultFolder),
     isEmpty: (path) => ipcRenderer.invoke('isempty', path),
     getHomeFolder: () => ipcRenderer.invoke('gethomefoler'),
-    getImage: (path) => ipcRenderer.invoke('getimage', path)
+    getToken: () => ipcRenderer.invoke('gettoken'),
 });

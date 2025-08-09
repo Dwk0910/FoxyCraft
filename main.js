@@ -58,13 +58,14 @@ if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder);
 let token = crypto.randomBytes(32).toString('base64url');
 fs.writeFileSync(tokenFile, token);
 
-// 렌더러에서 포트 번호 받기
-let backendPort = 8080;
-let isBackendReady = false;
-
-ipcMain.on('portnumber', (event, port) => {
-    backendPort = port;
-    isBackendReady = true;
+// 백엔드 포트 구하기
+// 하나는 가지고 하나는 렌더러로 넘기기
+// 백엔드에서 자신의 포트를 적는 시간을 벌기 위해 ipc 채널로 따로 생성
+let backendPort = 0;
+ipcMain.handle('getport', () => {
+    const str = fs.readFileSync(tokenFile).toString();
+    backendPort = str.split(".")[0];
+    return str.split(".")[0];
 });
 
 // 폴더가 비어있는지 확인 (렌더러용)
@@ -103,16 +104,10 @@ ipcMain.handle('gethomefoler', () => {
     return os.homedir();
 });
 
-// 렌더러에서 읽을 수 있는 이미지로 변환해서 넘기기
-ipcMain.handle('getimage', (event, path) => {
-    try {
-        const imageData = fs.readFileSync(path);
-        const base64_encoded = imageData.toString('base64');
-        return `data:image/png;base64,${base64_encoded}`;
-    } catch (ignored) {
-        return null;
-    }
-});
+// 렌더러로 토큰 넘기기
+ipcMain.handle('gettoken', () => {
+    return fs.readFileSync(path.join(os.tmpdir(), "foxycraft", "token.tk")).toString();
+})
 
 // run new backend process
 let javaProcess = undefined;

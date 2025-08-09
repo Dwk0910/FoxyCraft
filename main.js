@@ -103,6 +103,17 @@ ipcMain.handle('gethomefoler', () => {
     return os.homedir();
 });
 
+// 렌더러에서 읽을 수 있는 이미지로 변환해서 넘기기
+ipcMain.handle('getimage', (event, path) => {
+    try {
+        const imageData = fs.readFileSync(path);
+        const base64_encoded = imageData.toString('base64');
+        return `data:image/png;base64,${base64_encoded}`;
+    } catch (ignored) {
+        return null;
+    }
+});
+
 // run new backend process
 let javaProcess = undefined;
 app.on('ready', () => {

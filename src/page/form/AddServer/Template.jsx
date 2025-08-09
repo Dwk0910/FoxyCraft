@@ -133,6 +133,11 @@ export default function Template() {
     const customForm = (
         <>
             <div className={"mt-[15px]"}>
+                <style>{`
+                .ant-upload-list-item-name {
+                    max-width: 280px;
+                }
+                `}</style>
                 <Dragger {...draggerProp} fileList={ server.custom_runner_file } onChange={(event) => {
                     let newFileList = [...event.fileList];
 
@@ -200,8 +205,9 @@ export default function Template() {
                         ...prev,
                         custom_jre: jreOptions[parseInt(e.key) - 1].label
                     }));
+
             }}} trigger={["click"]}>
-                <div className={clsx("flex flex-row justify-between items-center w-full p-2 pl-3.5 mt-3 bg-[#404040] border-1 border-gray-500 rounded-[5px] cursor-pointer transition-all ease-in-out duration-200 hover:border-[#FF8904]", server.custom_runner_path && "mt-10")}>
+                <div className={clsx("flex flex-row justify-between items-center w-full p-2 pl-3.5 mt-3 bg-[#404040] border-1 border-gray-500 rounded-[5px] cursor-pointer transition-all ease-in-out duration-200 hover:border-[#FF8904]", server.custom_runner_file[0] && "mt-10")}>
                     { server.custom_jre ? server.custom_jre : (<span className={"font-suite text-gray-400"}>구동기 JRE 버전을 선택해 주세요</span>) }
                     <IoIosArrowDown className={"text-gray-400"}/>
                 </div>

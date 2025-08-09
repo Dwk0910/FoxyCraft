@@ -20,14 +20,14 @@ const defaultObject = {
     // publish
     port: 25565,
     servericon: [],
-    motd: "",
     servericon_path: "",
+    motd: "",
     max_player: 24,
     online_mode: true,
 
     // additional
     additional: []
-}
+};
 
 const baseServerAtom = atom(defaultObject);
 

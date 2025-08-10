@@ -53,7 +53,7 @@ export default function AddServer() {
                 [ server.path, await window.api.isEmpty(server.path) ]
             ],
             PublishSetting: [
-                [ server.port ]
+                [ server.port, server.max_player ]
             ],
             AdditionalSettings: [
             ]
@@ -187,8 +187,8 @@ export default function AddServer() {
                                                     item === undefined ||
                                                     item === null ||
                                                     item === "" ||
-                                                    item === 0 ||
-                                                    item === false
+                                                    item === false ||
+                                                    parseInt(item) === 0
                                                 ) isPassed = false;
                                             });
 

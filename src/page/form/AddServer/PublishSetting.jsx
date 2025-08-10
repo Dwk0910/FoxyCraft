@@ -4,6 +4,7 @@ import $ from 'jquery';
 // assets
 import previewBg from '../../../assets/images/dirt_background.png';
 import defaultPackIcon from '../../../assets/images/pack.svg';
+import pingIcon from '../../../assets/images/ping.png';
 
 // components
 import Form from "../../../component/AddServer/Form";
@@ -32,18 +33,30 @@ export default function PublishSetting() {
         accept: '.png'
     };
 
+    // 저장사항 복구
+    // icon이 손실되었을 경우
+    if (server.servericon.length !== 0 && icon === null) {
+        const func = async () => {
+            await resizeImageToBase64(server.servericon[0].originFileObj, 64, 64, "PNG", 100, async uri => setIcon(uri));
+        };
+        void func();
+    }
+
     return (
         <Form title={"공개 설정"}>
             <div className={"flex flex-col"}>
                 {/*preview*/}
                 <span className={"mb-2 font-SeoulNamsanM text-[1.04rem]"}>미리보기</span>
                 <div className={"flex flex-row justify-start items-center w-full h-25 border-gray-600 border-2 rounded-[5px]"} style={{ backgroundImage: `url(${previewBg})` }}>
-                    <img src={defaultPackIcon} className={"h-20 ml-2.5"} alt={"defaultlogo"}/>
-                    <div className={"flex flex-col items-start h-[90%] w-120 ml-3"}>
+                    { icon ? (<img src={icon} className={"h-20 ml-2.5"} alt={"servericon"}/>) : (<img src={defaultPackIcon} className={"h-20 ml-2.5"} alt={"servericon"}/>)}
+                    <div className={"flex flex-col items-start h-[90%] w-113 ml-3"}>
                         <span className={"text-[1.4rem] font-[MinecraftRegular] mt-1"}>Minecraft Server</span>
-                        <span className={"text-[1.2rem] mt-[-5px] text-[#AAAAAA]"} style={{ fontFamily: "MinecraftRegular" }}>A Minecraft Server</span>
+                        <span className={"text-[1.4rem] font-[MinecraftRegular] mt-[-5px] text-[#AAAAAA] text-nowrap"}>A Minecraft Server</span>
                     </div>
-                    aa
+                    <div className={"flex flex-row items-start h-[90%] ml-3"}>
+                        <span className={"text-[1.4rem] font-[MinecraftRegular] text-[#AAAAAA] mt-1"}>0<span className={"text-gray-500"}>/</span>{ server.max_player }</span>
+                        <img src={pingIcon} alt={"ping"} className={"ml-1.5 mt-1.5"}/>
+                    </div>
                 </div>
 
                 {/*main*/}
@@ -134,6 +147,7 @@ export default function PublishSetting() {
                         }} onRemove={(event) => {
                             if (!event.originFileObj) return;
 
+                            // 백엔드에서 파일 업로드 취소
                             const formData = new FormData();
                             formData.append("file", event.originFileObj, 'icon.png');
 
@@ -150,7 +164,8 @@ export default function PublishSetting() {
 
                             void setServer(prev => ({
                                 ...prev,
-                                servericon_path: ""
+                                servericon_path: "",
+                                servericon: []
                             }));
 
                             setIcon(null);

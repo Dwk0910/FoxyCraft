@@ -21,6 +21,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: "unifont";
+    src: url("./assets/fonts/unifont-16.0.04.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* @font-face kit by Fonts2u (https://fonts2u.com) */
 @font-face {
     font-family:"MinecraftRegular";

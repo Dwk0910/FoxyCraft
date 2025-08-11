@@ -1,5 +1,6 @@
 
 import $ from 'jquery';
+import clsx from 'clsx';
 
 // assets
 import previewBg from '../../../assets/images/dirt_background.png';
@@ -14,9 +15,10 @@ import { Input, Popover, Upload, Switch } from 'antd';
 // icons
 import { HiQuestionMarkCircle } from "react-icons/hi2";
 import { SlPicture } from "react-icons/sl";
+import { PiWarningFill } from "react-icons/pi";
 
 // store
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useAtom } from 'jotai';
 import { serverAtom } from '../../../jotai/serverAtom';
 
@@ -24,6 +26,8 @@ export default function PublishSetting() {
     const backendport = localStorage.getItem("backend");
     const [server, setServer] = useAtom(serverAtom);
     const [icon, setIcon] = useState(null);
+    const [autoLine, setAutoLine] = useState(false);
+    const [warn, setWarn] = useState(false);
 
     // Dragger settings
     const { Dragger } = Upload;
@@ -42,6 +46,79 @@ export default function PublishSetting() {
         void func();
     }
 
+    const isSupported = (inputString) => {
+        // 네가 보내준 이미지에 포함된 모든 글자들을 하나의 문자열로 합친 것
+        // 한글은 지원하지 않으니 제외했어.
+        const supportedChars = `!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~
+                           €‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬­ ®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+                           ─│┌┐└┘├┤┬┴┼═║╒╓╔╕╗╘╙╚╛╝╞╟╠╡╢╣╤╥╦╧╨╩
+                           АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя
+                           ΆΈΉΊΌΎΏαβγδεζηθικλμνξοπρςστυφχψω
+                           ╸━┃┏┓┛┗┣┫┳┻╋┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿
+                           ЁІЇЎ
+                           ╍╎╏═║╬
+                           ╌╌
+                           `
+            + ' ' // 공백도 지원되는 글자니까 따로 추가
+            + '\n'; // 줄바꿈도 지원되는 글자니까 따로 추가
+
+        // 입력된 문자열이 없으면 true 반환 (에러 방지)
+        if (!inputString) return true;
+
+        // 입력된 문자열의 모든 글자를 순회
+        for (const char of inputString) {
+            // supportedChars에 해당 글자가 포함되어 있지 않으면
+            if (!supportedChars.includes(char)) {
+                return false; // 바로 false를 반환하고 함수 종료
+            }
+        }
+
+        // 모든 글자가 지원하는 글자일 경우
+        return true;
+    };
+
+    const toUnicode = (inputString) => {
+        // 결과 문자열을 저장할 변수
+        let result = '';
+
+        // 입력된 문자열의 각 글자를 순회
+        for (let i = 0; i < inputString.length; i++) {
+            // charCodeAt()으로 글자의 유니코드 값을 가져옴
+            const charCode = inputString.charCodeAt(i);
+
+            // 16진수로 변환하고, 4자리로 맞추기 위해 '0'을 채움
+            // 예시: '안' -> 50504 -> C548
+            const hex = charCode.toString(16).toUpperCase().padStart(4, '0');
+
+            // 최종 결과에 \u와 함께 추가
+            result += `\\u${hex}`;
+        }
+
+        return result;
+    };
+
+    // 비 ASCII 문자는 길이가 때때로 달라지므로, 사전에 경고하여야 함
+    useEffect(() => {
+        setWarn(!isSupported(server.motd));
+        console.log(toUnicode(server.motd));
+    }, [server.motd]);
+
+    // motd 미리보기 리스트
+    // 영어 45자, 유니코드 43자
+
+    let motdList_1 = server.motd.split("");
+
+    let preview_1 = [];
+    let i = 0;
+    // 첫줄
+    for (const item of motdList_1) {
+        if (item === " ") preview_1.push(<span key={i}> </span>);
+        else if (item === "\n") preview_1.push(<span key={i} className={"w-full"}></span>);
+        else if (isSupported(item)) preview_1.push(<span key={i} className={"font-[MinecraftRegular] text-[#AAAAAA] text-[1.4rem] h-5"}>{item}</span>);
+        else preview_1.push(<span key={i} className={"font-[unifont] text-[#AAAAAA] text-[1.1rem] h-5"}>{item}</span>);
+        i++;
+    }
+
     return (
         <Form title={"공개 설정"}>
             <div className={"flex flex-col"}>
@@ -49,11 +126,14 @@ export default function PublishSetting() {
                 <span className={"mb-2 font-SeoulNamsanM text-[1.04rem]"}>미리보기</span>
                 <div className={"flex flex-row justify-start items-center w-full h-25 border-gray-600 border-2 rounded-[5px]"} style={{ backgroundImage: `url(${previewBg})` }}>
                     { icon ? (<img src={icon} className={"h-20 ml-2.5"} alt={"servericon"}/>) : (<img src={defaultPackIcon} className={"h-20 ml-2.5"} alt={"servericon"}/>)}
-                    <div className={"flex flex-col items-start h-[90%] w-130 ml-3"}>
-                        <span className={"text-[1.4rem] font-[MinecraftRegular] mt-1"}>Minecraft Server</span>
-                        <span className={"text-[1.4rem] font-[MinecraftRegular] mt-[-5px] text-[#AAAAAA] text-nowrap whitespace-pre-wrap leading-6"}>{ server.motd }</span>
+                    <div className={"flex flex-col items-start h-[90%] w-127 ml-3"}>
+                        <span className={"text-[1.4rem] font-[MinecraftRegular]"}>Minecraft Server</span>
+                        {/*<span className={"text-[1.4rem] font-[MinecraftRegular] mt-[-5px] text-[#AAAAAA] text-nowrap whitespace-pre-wrap leading-5"}>{ server.motd }</span>*/}
+                        <span className={"flex flex-row mt-[2px] w-152 flex-wrap leading-[20px] overflow-y-hidden"}>{ preview_1 }</span>
+                        {/*마스킹 이미지*/}
+                        <img alt="mask" src={previewBg} className={"h-3 w-152 absolute mt-19 object-cover"}/>
                     </div>
-                    <div className={"flex flex-row items-start h-[90%] ml-6.5"}>
+                    <div className={"flex flex-row items-start h-[90%]"}>
                         <span className={"text-[1.4rem] font-[MinecraftRegular] text-[#AAAAAA] mt-1"}>0<span className={"text-gray-500"}>/</span>{ server.max_player }</span>
                         <img src={pingIcon} alt={"ping"} className={"ml-1.5 mt-1.5"}/>
                     </div>
@@ -64,12 +144,53 @@ export default function PublishSetting() {
                 <div className={"flex flex-row w-full border-t-1 border-gray-500"}>
                     <div className={"flex flex-col w-127 h-90"}>
                         <span className={"pr-3 mt-4 font-suite text-gray-300"}>Server motd</span>
-                        <textarea className={"mt-2 mr-5 p-1 border-gray-500 border-1 rounded-[5px] resize-none"} cols={2} value={ server.motd } onChange={(e) =>
-                        {
-                            console.log(server.motd);
-                            void setServer(prev => ({...prev, motd: e.target.value}));
+                        <textarea className={ clsx("mt-2 mr-5 p-2 min-h-17 border-gray-500 border-1 rounded-[5px] resize-none text-nowrap", warn && "border-yellow-300")} cols={2} value={ server.motd } onKeyDown={e => {
+                            // noinspection JSUnresolvedReference
+                            const value = e.target.value;
+
+                            // 줄바꿈은 수동으로 등록
+                            if (e.key === "Enter") {
+                                if (!server.motd.includes("\n")) {
+                                    void setServer(prev => ({
+                                        ...prev,
+                                        motd: value + "\n"
+                                    }));
+                                }
+                                e.preventDefault();
+                            }
+                        }} onChange={ e => {
+                            const value = e.target.value;
+
+                            // 한 줄에는 최대 45자까지만 들어갈 수 있음
+                            // 첫 번째 줄의 경우 45자를 넘어가면 자동으로 줄바꿈이 되어야 함
+                            // 총 합 90자 넘어가면 안됨
+
+                            // \n의 유무로 줄바꿈 여부를 판단하여야 함
+
+                            // // 줄바꿈을 하지 않음
+                            // if (!value.includes("\n")) {
+                            //     if (value.length < 45) void setServer(prev => ({...prev, motd: value}));
+                            // } else {
+                            //     // 줄바꿈을 하였으므로 두 개로 나눠서 처리하여야 함
+                            //     const [line1, line2] = value.split("\n");
+                            //     if (line1.length < 45 && line2.length < 45) void setServer(prev => ({...prev, motd: line1 + "\n" + line2}));
+                            // }
+                            //
+
+                            // 띄어쓰기의 경우에는 비슷하게 생긴 다른 유니코드를 사용하여야 함
+                            if (value.split("")[value.split("").length - 1] === " ") void setServer(prev => ({...prev, motd: prev.motd + " "}));
+                            // 일반 입력
+                            else void setServer(prev => ({...prev, motd: value}));
                         }}/>
-                        <div className={"flex flex-row w-full mt-4"}>
+                        {
+                            warn ? (
+                                <div className={"flex flex-row mt-2 text-[1.3rem] ml-1 text-yellow-300 items-center"}>
+                                    <PiWarningFill/>
+                                    <span className={"font-suite text-[0.8rem] ml-3"}>비 ASCII 문자가 motd에 포함되었습니다. 미리보기와 다르게 표시될 수 있습니다.</span>
+                                </div>
+                            ) : ""
+                        }
+                        <div className={clsx("flex flex-row w-full mt-4 transition-all duration-300")}>
                             <span className={"pr-3 mb-3 font-suite text-gray-300"}>서버를 공개할 포트 번호를 입력해주세요</span>
                             <Popover title={<span className={"font-SeoulNamsanM text-[1.1rem]"}>포트 번호</span>} content={<span className={"font-suite"}>공유기를 사용하는 사용자에 한해, 이 곳에 입력한 포트에 대해 <span className={"text-orange-300 underline"}>포트포워딩이 되어있어야 (포트가 열려있어야)</span> 외부에서 정상적인 접속이 가능합니다.<br/>각 공유기의 포트포워딩 방법은 공유기 제조사 설명서나 공식 홈페이지를 참조하세요.</span>}>
                                 <HiQuestionMarkCircle className={"text-gray-300 mt-1"}/>

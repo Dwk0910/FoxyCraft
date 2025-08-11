@@ -47,8 +47,6 @@ export default function PublishSetting() {
     }
 
     const isSupported = (inputString) => {
-        // 네가 보내준 이미지에 포함된 모든 글자들을 하나의 문자열로 합친 것
-        // 한글은 지원하지 않으니 제외했어.
         const supportedChars = `!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~
                            €‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬­ ®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
                            ─│┌┐└┘├┤┬┴┼═║╒╓╔╕╗╘╙╚╛╝╞╟╠╡╢╣╤╥╦╧╨╩

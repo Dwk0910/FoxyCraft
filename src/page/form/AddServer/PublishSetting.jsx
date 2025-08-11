@@ -49,20 +49,26 @@ export default function PublishSetting() {
                 <span className={"mb-2 font-SeoulNamsanM text-[1.04rem]"}>미리보기</span>
                 <div className={"flex flex-row justify-start items-center w-full h-25 border-gray-600 border-2 rounded-[5px]"} style={{ backgroundImage: `url(${previewBg})` }}>
                     { icon ? (<img src={icon} className={"h-20 ml-2.5"} alt={"servericon"}/>) : (<img src={defaultPackIcon} className={"h-20 ml-2.5"} alt={"servericon"}/>)}
-                    <div className={"flex flex-col items-start h-[90%] w-113 ml-3"}>
+                    <div className={"flex flex-col items-start h-[90%] w-130 ml-3"}>
                         <span className={"text-[1.4rem] font-[MinecraftRegular] mt-1"}>Minecraft Server</span>
-                        <span className={"text-[1.4rem] font-[MinecraftRegular] mt-[-5px] text-[#AAAAAA] text-nowrap"}>A Minecraft Server</span>
+                        <span className={"text-[1.4rem] font-[MinecraftRegular] mt-[-5px] text-[#AAAAAA] text-nowrap whitespace-pre-wrap leading-6"}>{ server.motd }</span>
                     </div>
-                    <div className={"flex flex-row items-start h-[90%] ml-3"}>
+                    <div className={"flex flex-row items-start h-[90%] ml-6.5"}>
                         <span className={"text-[1.4rem] font-[MinecraftRegular] text-[#AAAAAA] mt-1"}>0<span className={"text-gray-500"}>/</span>{ server.max_player }</span>
                         <img src={pingIcon} alt={"ping"} className={"ml-1.5 mt-1.5"}/>
                     </div>
                 </div>
 
                 {/*main*/}
-                <span className={"mb-2 mt-4 font-SeoulNamsanM text-[1.04rem]"}>서버 설정</span>
+                <span className={"mb-2 mt-4 font-SeoulNamsanM text-[1.04rem]"}>설정</span>
                 <div className={"flex flex-row w-full border-t-1 border-gray-500"}>
-                    <div className={"flex flex-col w-110 border-r-1 h-90 border-gray-500"}>
+                    <div className={"flex flex-col w-127 h-90"}>
+                        <span className={"pr-3 mt-4 font-suite text-gray-300"}>Server motd</span>
+                        <textarea className={"mt-2 mr-5 p-1 border-gray-500 border-1 rounded-[5px] resize-none"} cols={2} value={ server.motd } onChange={(e) =>
+                        {
+                            console.log(server.motd);
+                            void setServer(prev => ({...prev, motd: e.target.value}));
+                        }}/>
                         <div className={"flex flex-row w-full mt-4"}>
                             <span className={"pr-3 mb-3 font-suite text-gray-300"}>서버를 공개할 포트 번호를 입력해주세요</span>
                             <Popover title={<span className={"font-SeoulNamsanM text-[1.1rem]"}>포트 번호</span>} content={<span className={"font-suite"}>공유기를 사용하는 사용자에 한해, 이 곳에 입력한 포트에 대해 <span className={"text-orange-300 underline"}>포트포워딩이 되어있어야 (포트가 열려있어야)</span> 외부에서 정상적인 접속이 가능합니다.<br/>각 공유기의 포트포워딩 방법은 공유기 제조사 설명서나 공식 홈페이지를 참조하세요.</span>}>
@@ -73,7 +79,7 @@ export default function PublishSetting() {
                             <Input placeholder={"공개할 포트"} value={server.port} style={{ width: 100, textAlign: 'center' }} onChange={(e) => setServer(prev => ({...prev, port: e.target.value}))}/>
                         </div>
                         <div className={"flex flex-row mt-5"}>
-                            <span className={"pr-3 mb-3 font-suite text-gray-300"}>서버 접속 최대인원 (권장: 24명)</span>
+                            <span className={"pr-3 mb-3 font-suite text-gray-300"}>서버 접속 최대인원 (권장: 20명)</span>
                         </div>
                         <div className={"w-full pl-0.5"}>
                             <Input placeholder={"최대인원"} value={ server.max_player } style={{ width: 100, textAlign: 'center' }} onChange={(e) => {

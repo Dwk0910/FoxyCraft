@@ -21,7 +21,7 @@ const defaultObject = {
     port: 25565,
     servericon: [],
     servericon_path: "",
-    motd: "",
+    motd: "A Minecraft Server",
     max_player: 20,
     online_mode: true,
 

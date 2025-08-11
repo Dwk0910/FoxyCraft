@@ -62,10 +62,16 @@ fs.writeFileSync(tokenFile, token);
 // 하나는 가지고 하나는 렌더러로 넘기기
 // 백엔드에서 자신의 포트를 적는 시간을 벌기 위해 ipc 채널로 따로 생성
 let backendPort = 0;
-ipcMain.handle('getport', () => {
-    const str = fs.readFileSync(tokenFile).toString();
-    backendPort = str.split(".")[0];
-    return str.split(".")[0];
+ipcMain.handle('getport', async () => {
+    do {
+        try {
+            const str = fs.readFileSync(tokenFile, 'utf8').toString();
+            backendPort = parseInt(str.split(".")[0]);
+            return backendPort;
+        } catch (err) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    } while (true);
 });
 
 // 폴더가 비어있는지 확인 (렌더러용)

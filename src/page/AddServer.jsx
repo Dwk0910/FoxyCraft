@@ -53,7 +53,7 @@ export default function AddServer() {
                 [ server.path, await window.api.isEmpty(server.path) ]
             ],
             PublishSetting: [
-                [ server.port ]
+                [ server.port, server.max_player ]
             ],
             AdditionalSettings: [
             ]
@@ -187,8 +187,8 @@ export default function AddServer() {
                                                     item === undefined ||
                                                     item === null ||
                                                     item === "" ||
-                                                    item === 0 ||
-                                                    item === false
+                                                    item === false ||
+                                                    parseInt(item) === 0
                                                 ) isPassed = false;
                                             });
 
@@ -213,7 +213,8 @@ export default function AddServer() {
                                         toast.error(<span className={"font-suite text-[0.9rem]"}>일부 입력란이 비워져 있거나 잘못되었습니다.</span>);
                                     }
                                 } else if (server.step === 4) {
-                                    // 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
+                                    // (마지막) 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
+                                    // 유의 : MOTD의 경우 비어있을 때 공백문자를 넣어야 함. 안그럴 경우 오류 발생 가능성 있음
 
                                 }
                             }}>
@@ -226,24 +227,4 @@ export default function AddServer() {
             </div>
         </div>
     );
-
-    // $.ajax({
-    //     url: `http://localhost:${backendport}/create`,
-    //     method: "POST",
-    //     contentType: "application/json",
-    //     data: JSON.stringify({
-    //         name: "Test",
-    //         serverDirectory: "C:\\Users\\hyang\\Documents",
-    //         args: ["-Xms1G", "-Xmx6G"],
-    //         port: 25565
-    //     }),
-    // }).then(resp => {
-    //     if (resp.ok) {
-    //         toast.success(
-    //             <span className={"font-suite text-[1rem]"}>
-    //                             UUID <span className={"font-bold"}>{resp.uuid}</span> 에 서버가 성공적으로 생성되었습니다.
-    //                         </span>
-    //         );
-    //     }
-    // });
 }

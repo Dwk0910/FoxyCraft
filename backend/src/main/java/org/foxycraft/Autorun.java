@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 @Component
@@ -26,7 +27,7 @@ public class Autorun implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         String port = env.getProperty("local.server.port");
         String token = Files.readString(FoxyCraft.tokenFile.toPath());
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(FoxyCraft.tokenFile))) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(FoxyCraft.tokenFile), StandardCharsets.UTF_8)) {
             writer.write(port + "." + token);
         }
     }

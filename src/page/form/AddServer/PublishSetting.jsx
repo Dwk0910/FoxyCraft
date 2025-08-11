@@ -26,7 +26,6 @@ export default function PublishSetting() {
     const backendport = localStorage.getItem("backend");
     const [server, setServer] = useAtom(serverAtom);
     const [icon, setIcon] = useState(null);
-    const [autoLine, setAutoLine] = useState(false);
     const [warn, setWarn] = useState(false);
 
     // Dragger settings

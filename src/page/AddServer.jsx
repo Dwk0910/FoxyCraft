@@ -20,6 +20,7 @@ import PublishSetting from "./form/AddServer/PublishSetting";
 import AdditionalSettings from "./form/AddServer/AdditionalSettings";
 
 // components
+import Form from '../component/AddServer/Form';
 import Header from "../component/Header";
 
 // atom
@@ -29,9 +30,99 @@ import { serverAtom } from "../jotai/serverAtom";
 export default function AddServer() {
     const [server, setServer] = useAtom(serverAtom);
 
+    const getRunnerFullName = (runner) => {
+        let result = "";
+        for (const item of runner) {
+            result += result.length !== 0 ? "-" + item : item;
+        }
+        return result;
+    };
+
+    const NA = () => {
+        return (
+            <span className={"font-SeoulNamsanM text-gray-300"}>해당 없음</span>
+        );
+    };
+
     const summaryPage = (
         <div>
-            <h1>Hello, World!</h1>
+            <Form title={"서버 추가 준비가 완료되었습니다"}>
+                <span className={"font-suite text-gray-300 mt-[-20px]"}>설정하신 내용을 다시 한 번 확인하시고, 서버 생성 버튼을 눌러주세요.</span>
+                <div className={"w-full flex flex-row mt-10 ml-12"}>
+                    <div className={"flex flex-col w-full"}>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>서버 이름</span>
+                            <span className={"text-white ml-3 w-130 text-nowrap overflow-hidden overflow-ellipsis"}>{ server.name }</span>
+                        </div>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>구동기 이름</span>
+                            <span className={"text-white ml-3"}>{ server.custom ? <NA/> : getRunnerFullName(server.runner) }</span>
+                        </div>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>커스텀 구동기 사용</span>
+                            <span className={"text-white ml-3"}>{ server.custom ? "Y" : "N" }</span>
+                        </div>
+                        {
+                            server.custom && (
+                                <>
+                                    <div className={"flex flex-row items-center"}>
+                                        <span className={"text-gray-400 font-suite w-30 text-right"}>구동기 이름</span>
+                                        <span className={"text-white ml-3 overflow-ellipsis overflow-hidden text-nowrap w-60"}>{ server.custom_runner_path.includes("\\") ? server.custom_runner_path.split("\\")[server.custom_runner_path.split("\\").length - 1] : server.custom_runner_path.split("/")[server.custom_runner_path.split("/").length - 1]}</span>
+                                    </div>
+                                    <div className={"flex flex-row items-center"}>
+                                        <span className={"text-gray-400 font-suite w-30 text-right"}>사용 JRE</span>
+                                        <span className={"text-white ml-3"}>{ server.custom_jre }</span>
+                                    </div>
+                                </>
+                            )
+                        }
+                        <div className={"flex flex-row items-center mt-3"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>서버 저장 위치</span>
+                            <span className={"text-white ml-3 w-130"}>{ server.path }</span>
+                        </div>
+
+                        <div className={"flex flex-row items-center mt-3"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>공개 포트</span>
+                            <span className={"text-white ml-3 w-20"}>{ server.port }</span>
+                        </div>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>커스텀 서버 아이콘</span>
+                            <span className={"text-white ml-3 w-20"}>{ server.servericon.length !== 0 ? "Y" : "N" }</span>
+                        </div>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>최대 플레이어</span>
+                            <span className={"text-white font-suite ml-3 w-20"}>{ server.max_player + "명" }</span>
+                        </div>
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>online mode</span>
+                            <span className={"text-white font-suite ml-3 w-20"}>{ server.online_mode ? "Y" : "N" }</span>
+                        </div>
+
+                        <div className={"flex flex-row items-center mt-3"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>자동 백업</span>
+                            <span className={"text-white ml-3 w-130"}>{ server.auto_backup ? "Y" : "N" }</span>
+                        </div>
+                        {
+                            server.auto_backup && (
+                                <>
+                                    <div className={"flex flex-row items-center"}>
+                                        <span className={"text-gray-400 font-suite w-30 text-right"}>백업 주기</span>
+                                        <span className={"text-white ml-3 w-130 font-suite"}>{ server.auto_backup_period + "분" }</span>
+                                    </div>
+                                    <div className={"flex flex-row items-center"}>
+                                        <span className={"text-gray-400 font-suite w-30 text-right"}>최대 백업 개수</span>
+                                        <span className={"text-white ml-3 w-130 font-suite"}>{ server.auto_backup_max_count + "개" }</span>
+                                    </div>
+                                </>
+                            )
+                        }
+                        <div className={"flex flex-row items-center"}>
+                            <span className={"text-gray-400 font-suite w-30 text-right"}>월드 이름</span>
+                            <span className={"text-white ml-3 w-130"}>{ server.world_name }</span>
+                        </div>
+                    </div>
+                </div>
+            </Form>
         </div>
     );
 
@@ -56,6 +147,14 @@ export default function AddServer() {
                 [ server.port, server.max_player ]
             ],
             AdditionalSettings: [
+                // custom name, auto_backup 활성화 시
+                [ server.custom_world_name, server.auto_backup, !server.custom_world_name_err, server.auto_backup_period, server.auto_backup_max_count ],
+                // custom name만 활성화 시
+                [ server.custom_world_name, !server.auto_backup, !server.custom_world_name_err ],
+                // auto_backup만 활성화 시
+                [ server.auto_backup, !server.custom_world_name, server.auto_backup_period, server.auto_backup_max_count ],
+                // 무엇도 활성화 하지 않을 경우
+                [ !server.custom_world_name, !server.auto_backup ]
             ]
         };
     };
@@ -67,6 +166,27 @@ export default function AddServer() {
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
+
+    // 전송 시 사용 (motd를 readable unicode escape로 변경)
+    const toUnicode = (inputString) => {
+        // 결과 문자열을 저장할 변수
+        let result = '';
+
+        // 입력된 문자열의 각 글자를 순회
+        for (let i = 0; i < inputString.length; i++) {
+            // charCodeAt()으로 글자의 유니코드 값을 가져옴
+            const charCode = inputString.charCodeAt(i);
+
+            // 16진수로 변환하고, 4자리로 맞추기 위해 '0'을 채움
+            // 예시: '안' -> 50504 -> C548
+            const hex = charCode.toString(16).toUpperCase().padStart(4, '0');
+
+            // 최종 결과에 \u와 함께 추가
+            result += `\\u${hex}`;
+        }
+
+        return result;
+    };
 
     return (
         <div className={"flex flex-col min-h-screen"}>

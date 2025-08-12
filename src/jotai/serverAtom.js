@@ -26,7 +26,12 @@ const defaultObject = {
     online_mode: true,
 
     // additional
-    additional: []
+    auto_backup: false,
+    auto_backup_period: 0,
+    auto_backup_max_count: 0,
+    custom_world_name: false,
+    custom_wrold_name_err: false,
+    world_name: "world"
 };
 
 const baseServerAtom = atom(defaultObject);

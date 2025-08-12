@@ -141,7 +141,7 @@ export default function Template() {
                 <Dragger {...draggerProp} fileList={ server.custom_runner_file } onChange={(event) => {
                     let newFileList = [...event.fileList];
 
-                    // fileList의 크기가 1보다 큰가? (업로드한 파일의 갯수가 한 개를 초과하는가?)
+                    // fileList의 크기가 1보다 큰가? (업로드한 파일의 개수가 한 개를 초과하는가?)
                     if (newFileList.length > 1) newFileList = newFileList.slice(-1);
 
                     void setServer(prev => ({

@@ -5,6 +5,7 @@ import { atom } from 'jotai';
 const defaultObject = {
     // global
     step: 0,
+    pageStatus: "full-left",
 
     // template
     name: "",

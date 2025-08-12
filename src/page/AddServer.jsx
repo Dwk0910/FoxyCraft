@@ -161,7 +161,6 @@ export default function AddServer() {
 
     // 페이지 state
     const [opacity, setOpacity] = useState(1);
-    const [pageStatus, setPageStatus] = useState("full-left");
 
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
@@ -257,14 +256,13 @@ export default function AddServer() {
                     {/*크기가 유동적으로 변하므로 div로 따로 관리*/}
                     <div className={"flex flex-row w-[100%] justify-start pr-20 mt-10 mb-10"}>
                         <div className={"w-[70%] ml-40"}>
-                            <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", pageStatus === "full-left" ? "bg-[#292929]" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
+                            <span className={clsx("flex flex-row transition-colors duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px]", server.pageStatus === "full-left" ? "bg-[#292929]" : "bg-orange-400 hover:bg-orange-500 cursor-pointer")} onClick={() => {
                                 if (server.step >= 1) {
                                     setOpacity(0);
                                     setTimeout(() => {
-                                        if (server.step === 1) setPageStatus("full-left");
-                                        else setPageStatus("center");
                                         void setServer(prev => ({
                                             ...prev,
+                                            pageStatus: prev.step === 1 ? "full-left" : "center",
                                             step: prev.step - 1
                                         }));
                                         setOpacity(1);
@@ -278,7 +276,7 @@ export default function AddServer() {
 
                         {/*다음/서버생성 버튼*/}
                         <div className={"flex justify-end w-[20%]"}>
-                            <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={ async () => {
+                            <span className={clsx("flex flex-row transition-all duration-150 items-center justify-center p-3 w-20 font-suite rounded-[7px] text-nowrap", server.pageStatus === "full-right" ? "w-30 form_last_button" : "bg-orange-400 hover:bg-orange-500", "cursor-pointer")} onClick={ async () => {
                                 /*
                                 [버튼을 누를 때]
                                 currentStep이 3 이하인가?
@@ -322,10 +320,9 @@ export default function AddServer() {
                                         setTimeout(() => {
                                             void setServer(prev => ({
                                                 ...prev,
+                                                pageStatus: prev.step === 3 ? "full-right" : "center",
                                                 step: prev.step + 1
                                             }));
-                                            if (server.step === 3) setPageStatus("full-right");
-                                            else setPageStatus("center");
                                             setOpacity(1);
                                         }, 150);
                                     } else {
@@ -338,7 +335,7 @@ export default function AddServer() {
 
                                 }
                             }}>
-                                { pageStatus === "full-right" ? "서버 생성" : "다음" }
+                                { server.pageStatus === "full-right" ? "서버 생성" : "다음" }
                                 <IoIosArrowForward className={"text-[1.2rem] mt-0.2"}/>
                             </span>
                         </div>

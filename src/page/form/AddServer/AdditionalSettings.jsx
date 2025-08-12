@@ -1,6 +1,10 @@
 
+import Form from '../../../component/AddServer/Form'
+
 export default function AdditionalSettings() {
     return (
-        <h1>AdditionalSettings</h1>
+        <Form title={"추가 설정"}>
+
+        </Form>
     );
 }

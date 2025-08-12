@@ -18,7 +18,7 @@ import { SlPicture } from "react-icons/sl";
 import { PiWarningFill } from "react-icons/pi";
 
 // store
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from 'jotai';
 import { serverAtom } from '../../../jotai/serverAtom';
 
@@ -47,7 +47,7 @@ export default function PublishSetting() {
 
     const isSupported = (inputString) => {
         const supportedChars = `!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~
-                           €‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬­ ®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+                           €‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
                            ─│┌┐└┘├┤┬┴┼═║╒╓╔╕╗╘╙╚╛╝╞╟╠╡╢╣╤╥╦╧╨╩
                            АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя
                            ΆΈΉΊΌΎΏαβγδεζηθικλμνξοπρςστυφχψω
@@ -74,30 +74,10 @@ export default function PublishSetting() {
         return true;
     };
 
-    const toUnicode = (inputString) => {
-        // 결과 문자열을 저장할 변수
-        let result = '';
-
-        // 입력된 문자열의 각 글자를 순회
-        for (let i = 0; i < inputString.length; i++) {
-            // charCodeAt()으로 글자의 유니코드 값을 가져옴
-            const charCode = inputString.charCodeAt(i);
-
-            // 16진수로 변환하고, 4자리로 맞추기 위해 '0'을 채움
-            // 예시: '안' -> 50504 -> C548
-            const hex = charCode.toString(16).toUpperCase().padStart(4, '0');
-
-            // 최종 결과에 \u와 함께 추가
-            result += `\\u${hex}`;
-        }
-
-        return result;
-    };
 
     // 비 ASCII 문자는 길이가 때때로 달라지므로, 사전에 경고하여야 함
     useEffect(() => {
         setWarn(!isSupported(server.motd));
-        console.log(toUnicode(server.motd));
     }, [server.motd]);
 
     // motd 미리보기 리스트
@@ -109,8 +89,8 @@ export default function PublishSetting() {
     let i = 0;
     // 첫줄
     for (const item of motdList_1) {
-        if (item === " ") preview_1.push(<span key={i}> </span>);
-        else if (item === "\n") preview_1.push(<span key={i} className={"w-full"}></span>);
+        if (item === "\n") preview_1.push(<span key={i} className={"w-full"}></span>);
+        else if (item === " ") preview_1.push(<span key={i} className={"text-[1.4rem"}>&nbsp;</span>);
         else if (isSupported(item)) preview_1.push(<span key={i} className={"font-[MinecraftRegular] text-[#AAAAAA] text-[1.4rem] h-5"}>{item}</span>);
         else preview_1.push(<span key={i} className={"font-[unifont] text-[#AAAAAA] text-[1.1rem] h-5"}>{item}</span>);
         i++;
@@ -174,10 +154,8 @@ export default function PublishSetting() {
                             // }
                             //
 
-                            // 띄어쓰기의 경우에는 비슷하게 생긴 다른 유니코드를 사용하여야 함
-                            if (value.split("")[value.split("").length - 1] === " ") void setServer(prev => ({...prev, motd: prev.motd + " "}));
                             // 일반 입력
-                            else void setServer(prev => ({...prev, motd: value}));
+                            void setServer(prev => ({...prev, motd: value}));
                         }}/>
                         {
                             warn ? (

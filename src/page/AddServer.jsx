@@ -68,6 +68,27 @@ export default function AddServer() {
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
 
+    // 전송 시 사용 (motd를 readable unicode escape로 변경)
+    const toUnicode = (inputString) => {
+        // 결과 문자열을 저장할 변수
+        let result = '';
+
+        // 입력된 문자열의 각 글자를 순회
+        for (let i = 0; i < inputString.length; i++) {
+            // charCodeAt()으로 글자의 유니코드 값을 가져옴
+            const charCode = inputString.charCodeAt(i);
+
+            // 16진수로 변환하고, 4자리로 맞추기 위해 '0'을 채움
+            // 예시: '안' -> 50504 -> C548
+            const hex = charCode.toString(16).toUpperCase().padStart(4, '0');
+
+            // 최종 결과에 \u와 함께 추가
+            result += `\\u${hex}`;
+        }
+
+        return result;
+    };
+
     return (
         <div className={"flex flex-col min-h-screen"}>
             <ToastContainer

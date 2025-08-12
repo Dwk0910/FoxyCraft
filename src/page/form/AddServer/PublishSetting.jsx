@@ -74,7 +74,6 @@ export default function PublishSetting() {
         return true;
     };
 
-
     // 비 ASCII 문자는 길이가 때때로 달라지므로, 사전에 경고하여야 함
     useEffect(() => {
         setWarn(!isSupported(server.motd));
@@ -153,7 +152,7 @@ export default function PublishSetting() {
                             //     if (line1.length < 45 && line2.length < 45) void setServer(prev => ({...prev, motd: line1 + "\n" + line2}));
                             // }
                             //
-
+                            
                             // 일반 입력
                             void setServer(prev => ({...prev, motd: value}));
                         }}/>

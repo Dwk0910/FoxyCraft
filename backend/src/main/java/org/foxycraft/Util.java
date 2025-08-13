@@ -5,22 +5,34 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Util {
     public static String dataPath = System.getProperty("user.dir") + File.separator + "data";
+    public static List<String> compatibleJRE = new ArrayList<>();
     public static Map<String, File> fileList = new HashMap<>();
+    public static Map<String, RunnerInfo> runnerOriginMap = new HashMap<>();
+
+    public record RunnerInfo(URL url, String reqJRE) {
+        public RunnerInfo {
+            if (!compatibleJRE.contains(reqJRE))
+                throw new IllegalArgumentException("JRE version " + reqJRE + " is not compatible.");
+        }
+    }
 
     static {
         File dataFolder = new File(dataPath);
@@ -38,6 +50,22 @@ public class Util {
             } catch (IOException e) {
                 FoxyCraft.logger.error(e);
             }
+        }
+
+        // register compatible JRE's version
+        compatibleJRE.addAll(List.of("JRE8", "JRE11", "JRE17", "JRE21"));
+
+        // register runner origin's URL
+        try {
+            runnerOriginMap.putAll(Map.of(
+                    "papermc-1.18.2", new RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar").toURL(), "JRE17"),
+                    "papermc-1.20.6", new RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640/paper-1.20.6-151.jar").toURL(), "JRE17"),
+                    "papermc-1.21.8", new RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/d310c61899acc608b683515c5c7ef929774bfd1b90262dac965e76c7e9ea8d22/paper-1.21.8-30.jar").toURL(), "JRE21")
+
+                    // TODO: 나머지 구동기
+            ));
+        } catch (URISyntaxException | MalformedURLException e) {
+            FoxyCraft.logger.error(e);
         }
     }
 
@@ -61,20 +89,37 @@ public class Util {
     }
 
     public static <T> void writeToFile(String fileName, T obj) {
-        try {
-            File f = fileList.get(fileName);
-            Writer writer = new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8);
+        File f = fileList.get(fileName);
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8)) {
 
             // 일부 특정 클래스는 다르게 처리
             String className = obj.getClass().getSimpleName();
-            if (className.equals("JSONArray")) writer.write(((JSONArray) obj).toString(4));
-            else if (className.equals("JSONObject")) writer.write(((JSONObject) obj).toString(4));
-            else {
-                writer.write(obj.toString());
+
+            switch (className) {
+                case "JSONArray" -> writer.write(((JSONArray) obj).toString(4));
+                case "JSONObject" -> writer.write(((JSONObject) obj).toString(4));
+                default -> writer.write(obj.toString());
             }
-            writer.close();
         } catch (FileNotFoundException e) {
             FoxyCraft.logger.error("파일을 찾을 수 없습니다 : {}", fileName);
+        } catch (IOException e) {
+            FoxyCraft.logger.error(e);
+        }
+    }
+
+    public static void downloadFileFromURL(URL url, File target) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (!target.exists()) Files.createFile(target.toPath());
+            FileOutputStream out = new FileOutputStream(target);
+            BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
+
+            int bytesRead;
+            byte[] buffer = new byte[16384];
+            while ((bytesRead = bis.read(buffer)) != -1) out.write(buffer, 0, bytesRead);
+
+            bis.close();
+            out.close();
         } catch (IOException e) {
             FoxyCraft.logger.error(e);
         }

@@ -1,5 +1,13 @@
 package org.foxycraft.controller;
 
+import org.apache.logging.log4j.core.util.FileUtils;
+
+import org.foxycraft.Util;
+import org.foxycraft.FoxyCraft;
+import org.foxycraft.dto.ServerCreateRequest;
+
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,35 +17,62 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import org.foxycraft.object.Server;
-import org.foxycraft.Util;
+import java.io.File;
+import java.io.IOException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
 @RestController
 public class ServerCRUD {
     @PostMapping("/create")
-    public Map<String, Object> create(@RequestBody Server server) {
-        UUID uuid = UUID.randomUUID();
+    public ResponseEntity<String> create(@RequestBody ServerCreateRequest server) {
+        try {
+            // 서버 식별자 랜덤생성
+            UUID uuid = UUID.randomUUID();
 
-        JSONArray serverList = Util.getContent("serverlist.dat", JSONArray.class);
-        serverList.put(new JSONObject()
-                .put("uuid", uuid.toString())
-                .put("name", server.name())
-                .put("argument", new JSONArray(server.args()))
-                .put("path", server.serverDirectory().toPath())
-                .put("reqJRE", server.reqJRE())
-                .put("port", server.port()));
+            // 서버 파일/폴더들 위치 확인
+            File path = new File(server.path());
+            if (!path.exists()) FileUtils.mkdir(path, true);
 
-        Util.writeToFile("serverlist.dat", serverList);
+            if (!server.servericon_path().isEmpty()) {
+                File servericon = new File(server.servericon_path());
+                if (!servericon.exists()) return ResponseEntity.status(515).body("servericon");
+            }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("ok", true);
-        result.put("uuid", uuid);
+            File runner;
 
-        return result;
+            JSONArray serverList = Util.getContent("serverlist.dat", JSONArray.class);
+            if (server.isCustom()) {
+                // 커스텀 구동기 사용
+                File custom_runner = new File(server.custom_runner_path());
+                if (!custom_runner.exists())
+                    return ResponseEntity.status(515).body("custom_runner");
+                Files.move(custom_runner.toPath(), Paths.get(path.toPath().toString(), File.separator, custom_runner.getName()), StandardCopyOption.REPLACE_EXISTING);
+                runner = new File(path.toPath() + File.separator + custom_runner.getName());
+            }
+
+            // 일반 구동기 사용
+
+
+            serverList.put(new JSONObject()
+                    .put("name", server.name())
+                    .put("runner", runner.toPath())
+                    .put("")
+            );
+
+//            Util.writeToFile("serverlist.dat", serverList);
+//
+
+        } catch (IOException e) {
+            FoxyCraft.logger.error(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return null;
     }
 }

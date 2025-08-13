@@ -49,39 +49,44 @@ export default function App() {
     useEffect(() => {
         const run = async () => {
             const token = await window.api.getToken();
-            const port = await window.api.getPort();
+            let port = await window.api.getPort();
+
+            while (port === 'err') {
+                port = await window.api.getPort();
+            }
 
             localStorage.setItem("backend", port);
+            setIsLoading(false);
 
-            try {
-                // 1차검사
-                const response = await axios.post(`http://localhost:${port}/health`, {}, { timeout: 1200 });
-                if (response.status === 200 && response.data === token) {
-                    setIsLoading(false);
-                }
-            } catch (err) {
-                console.log("서버 연결 실패... 재검사 중 (20회)");
-            }
-
-            // 2차검사
-            if (isLoading) {
-                for (let i = 0; i < 20; i++) {
-                    const token = await window.api.getToken();
-                    const port = await window.api.getPort();
-
-                    localStorage.setItem("backend", port);
-
-                    try {
-                        const response = await axios.post(`http://localhost:${port}/health`, {}, {timeout: 1200});
-                        await new Promise(resolve => setTimeout(resolve, 1200));
-                        if (response.status === 200 && response.data === token) {
-                            setIsLoading(false);
-                            break;
-                        }
-                    } catch (ignored) {
-                    }
-                }
-            }
+            // try {
+            //     // 1차검사
+            //     const response = await axios.post(`http://localhost:${port}/health`, {}, { timeout: 1200 });
+            //     if (response.status === 200 && response.data === token) {
+            //         setIsLoading(false);
+            //     }
+            // } catch (err) {
+            //     console.log("서버 연결 실패... 재검사 중 (20회)");
+            // }
+            //
+            // // 2차검사
+            // if (isLoading) {
+            //     for (let i = 0; i < 20; i++) {
+            //         const token = await window.api.getToken();
+            //         const port = await window.api.getPort();
+            //
+            //         localStorage.setItem("backend", port);
+            //
+            //         try {
+            //             const response = await axios.post(`http://localhost:${port}/health`, {}, {timeout: 1200});
+            //             await new Promise(resolve => setTimeout(resolve, 1200));
+            //             if (response.status === 200 && response.data === token) {
+            //                 setIsLoading(false);
+            //                 break;
+            //             }
+            //         } catch (ignored) {
+            //         }
+            //     }
+            // }
 
             // 서버찾기 실패
             if (isLoading) setLoadingStatus("서버를 찾을 수 없습니다.");

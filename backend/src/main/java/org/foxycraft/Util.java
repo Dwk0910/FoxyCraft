@@ -61,18 +61,17 @@ public class Util {
     }
 
     public static <T> void writeToFile(String fileName, T obj) {
-        try {
-            File f = fileList.get(fileName);
-            Writer writer = new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8);
+        File f = fileList.get(fileName);
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8)) {
 
             // 일부 특정 클래스는 다르게 처리
             String className = obj.getClass().getSimpleName();
-            if (className.equals("JSONArray")) writer.write(((JSONArray) obj).toString(4));
-            else if (className.equals("JSONObject")) writer.write(((JSONObject) obj).toString(4));
-            else {
-                writer.write(obj.toString());
+
+            switch (className) {
+                case "JSONArray" -> writer.write(((JSONArray) obj).toString(4));
+                case "JSONObject" -> writer.write(((JSONObject) obj).toString(4));
+                default -> writer.write(obj.toString());
             }
-            writer.close();
         } catch (FileNotFoundException e) {
             FoxyCraft.logger.error("파일을 찾을 수 없습니다 : {}", fileName);
         } catch (IOException e) {

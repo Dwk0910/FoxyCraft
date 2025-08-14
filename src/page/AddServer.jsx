@@ -1,4 +1,5 @@
 
+import $ from 'jquery';
 import { useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
 
@@ -169,7 +170,35 @@ export default function AddServer() {
         setDialogOpen(false);
 
         // ajax요청
-
+        const backendport = localStorage.getItem("backend");
+        $.ajax({
+            url: `http://localhost:${backendport}/servercrud/create`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                name: server.name,
+                path: server.path,
+                isCustom: server.custom,
+                runner: getRunnerFullName(server.runner),
+                custom_jre: server.custom_jre,
+                custom_runner_path: server.custom_runner_path,
+                port: server.port,
+                servericon_path: server.servericon_path,
+                motd: server.motd,
+                max_player: server.max_player,
+                online_mode: server.online_mode,
+                auto_backup: server.auto_backup,
+                auto_backup_period: server.auto_backup_period,
+                auto_backup_max_count: server.auto_backup_max_count,
+                world_name: server.world_name
+            }),
+            success: resp => {
+                console.log(resp);
+            },
+            error: err => {
+                console.log(err);
+            }
+        })
     };
 
     // 페이지 state

@@ -5,7 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.Writer;
+import java.io.BufferedInputStream;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import java.net.URI;
 import java.net.URL;
@@ -16,17 +22,15 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Util {
-    public static String dataPath = System.getProperty("user.dir") + File.separator + "data";
-    public static List<String> compatibleJRE = new ArrayList<>();
-    public static Map<String, File> fileList = new HashMap<>();
-    public static Map<String, RunnerInfo> runnerOriginMap = new HashMap<>();
+import static org.foxycraft.FoxyCraft.fileList;
+import static org.foxycraft.FoxyCraft.compatibleJRE;
+import static org.foxycraft.FoxyCraft.dataPath;
+import static org.foxycraft.FoxyCraft.runnerOriginMap;
 
+public class Util {
     public record RunnerInfo(URL url, String reqJRE) {
         public RunnerInfo {
             if (!compatibleJRE.contains(reqJRE))

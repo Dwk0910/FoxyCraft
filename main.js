@@ -66,6 +66,7 @@ ipcMain.handle('getport', async () => {
     try {
         const str = fs.readFileSync(tokenFile, 'utf8').toString();
         backendPort = parseInt(str.split(".")[0]);
+        if (isNaN(backendPort)) return 'err';
         return backendPort;
     } catch (err) {
         return 'err';
@@ -117,7 +118,12 @@ ipcMain.handle('gettoken', () => {
 let javaProcess = undefined;
 app.on('ready', () => {
     const jarPath = path.join(process.resourcesPath, 'FoxyCraft.jar');
+    const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
+    if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
+    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
+
     let javaExecutable = "";
+
     if (app.isPackaged) {
         if (process.platform === "win32" && process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jre_win_64", "bin", "java.exe");
         else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "jre", "Contents", "Home", "bin", "java");
@@ -134,7 +140,7 @@ app.on('ready', () => {
         }
 
         log.info(`Starting Springboot App with ${javaExecutable}`);
-        javaProcess = spawn(javaExecutable, ["-jar", jarPath]);
+        javaProcess = spawn(javaExecutable, ["-jar", jarPath, datapath_argument]);
     } else {
         // 개발 모드에서는 gradlew run 사용
 
@@ -144,7 +150,7 @@ app.on('ready', () => {
         }
         // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            exec("cmd /c start cmd.exe /c \"cd backend && .\\gradlew.bat bootRun & exit\"");
+            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument} & exit"`);
         }
     }
 

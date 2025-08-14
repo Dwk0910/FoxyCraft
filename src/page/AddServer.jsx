@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { toast, ToastContainer } from "react-toastify";
-import { Steps, ConfigProvider } from 'antd';
 
 import clsx from "clsx";
+import getRunnerLicense from '../../func/getRunnerLicense';
 
 // icons
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
@@ -20,6 +20,8 @@ import PublishSetting from "./form/AddServer/PublishSetting";
 import AdditionalSettings from "./form/AddServer/AdditionalSettings";
 
 // components
+import { Steps, ConfigProvider, Modal, theme, Checkbox } from 'antd';
+const  { darkAlgorithm } = theme;
 import Form from '../component/AddServer/Form';
 import Header from "../component/Header";
 
@@ -159,12 +161,29 @@ export default function AddServer() {
         };
     };
 
+    const sendCreateRequest = () => {
+        // (마지막) 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
+        // 유의 : MOTD의 경우 비어있을 때 공백문자를 넣어야 함. 안그럴 경우 오류 발생 가능성 있음
+
+        // dialog닫고 로딩창 띄우기
+        setDialogOpen(false);
+
+        // ajax요청
+
+    };
+
     // 페이지 state
     const [opacity, setOpacity] = useState(1);
 
     // Steps에 쓸 style class
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
+
+    // dialog 출력에서 사용
+    const [checked, setChecked] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogTitle, setDialogTitle] = useState("");
+    const [dialogMessage, setDialogMessage] = useState("");
 
     // 전송 시 사용 (motd를 readable unicode escape로 변경)
     const toUnicode = (inputString) => {
@@ -200,6 +219,7 @@ export default function AddServer() {
             <Header icon={<FiPlus/>}>서버 추가</Header>
             <div className={"flex flex-row justify-end flex-2/6"}>
                 <ConfigProvider theme={{
+                    algorithm: darkAlgorithm,
                     token: {
                         colorPrimary: '#FF8904'
                     }
@@ -246,6 +266,28 @@ export default function AddServer() {
                             }
                         ]} current={server.step}/>
                     </div>
+                    {/*최종 경고창*/}
+                    <Modal
+                        width={800}
+                        title={<span className={"font-SeoulNamsanM text-[1.2rem]"}>라이선스 경고</span>}
+                        open={dialogOpen}
+                        closable={false}
+                        okButtonProps={{ disabled: !checked }}
+                        okText={<span className={"font-suite"}>동의</span>}
+                        cancelText={<span className={"font-suite"}>취소</span>}
+                        onCancel={ignored => setDialogOpen(false)}
+                        onOk={sendCreateRequest}
+                        centered
+                    >
+                        <div className={"font-suite text-[1rem] mt-5"}>{ dialogTitle }</div>
+                        <div className={"w-full mt-5 p-2 bg-gray-900 text-white font-mono border-gray-600 border-1 rounded-[5px] h-130 mb-5 overflow-y-auto flex flex-col text-left"}>
+                            { dialogMessage }
+                        </div>
+                        <div className={"flex flex-row absolute mt-1.5 pl-0.5"}>
+                            <Checkbox checked={ checked } onChange={e => setChecked(e.target.checked)}/>
+                            <span className={"font-suite text-[0.9rem] ml-3 cursor-pointer"} onClick={() => setChecked(prev => !prev)}>위 내용을 읽고 확인하였으며, 이에 동의합니다.</span>
+                        </div>
+                    </Modal>
                 </ConfigProvider>
                 <div className={"flex flex-col min-h-full flex-4/6"}>
                     {/*Form*/}
@@ -330,9 +372,24 @@ export default function AddServer() {
                                         toast.error(<span className={"font-suite text-[0.9rem]"}>일부 입력란이 비워져 있거나 잘못되었습니다.</span>);
                                     }
                                 } else if (server.step === 4) {
-                                    // (마지막) 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
-                                    // 유의 : MOTD의 경우 비어있을 때 공백문자를 넣어야 함. 안그럴 경우 오류 발생 가능성 있음
+                                    // 라이선스 출력
+                                    if (!server.custom) {
+                                        const licenseName = (<span className={"font-bold"}>{getRunnerLicense(server.runner[0]).name}</span>);
+                                        const license = getRunnerLicense(server.runner[0]).content.split("\n");
+                                        const licenseToPrint = [];
 
+                                        license.map((item, i) => {
+                                            licenseToPrint.push(item);
+                                            licenseToPrint.push(<span key={i} className={"w-full"}></span>);
+                                        });
+
+                                        // 체크박스 초기화
+                                        setChecked(false);
+
+                                        setDialogTitle(<>선택하신 <span className={"font-bold"}>{server.runner[0]}</span> 구동기는 {licenseName} 라이선스를 사용합니다. 이 구동기를 다운로드 받고 서버를 구동하려면 아래 라이선스 내용에 동의하여야 합니다.</>);
+                                        setDialogMessage(licenseToPrint);
+                                        setDialogOpen(true);
+                                    }
                                 }
                             }}>
                                 { server.pageStatus === "full-right" ? "서버 생성" : "다음" }

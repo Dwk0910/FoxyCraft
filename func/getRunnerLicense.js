@@ -915,4 +915,4 @@ export default function getRunnerLicense(runnerName) {
         name: license[runnerName]?.name,
         content: license[runnerName]?.content
     };
-}
+};

@@ -121,6 +121,7 @@ app.on('ready', () => {
     const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
     if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
     const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}"`;
 
     let javaExecutable = "";
 
@@ -146,11 +147,11 @@ app.on('ready', () => {
 
         // mac에서는 gradlew
         if (process.platform === "darwin") {
-            javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
+            javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun", datapath_argument_dev], { cwd: path.join(__dirname, "backend")});
         }
         // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument} & exit"`);
+            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & pause & exit"`);
         }
     }
 

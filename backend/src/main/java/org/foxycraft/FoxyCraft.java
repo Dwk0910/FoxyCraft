@@ -22,7 +22,6 @@ public class FoxyCraft {
     public static Map<String, File> fileList = new HashMap<>();
     public static Map<String, Util.RunnerInfo> runnerOriginMap = new HashMap<>();
 
-
     public static void main(String[] args) {
         SpringApplication.run(FoxyCraft.class, args);
     }

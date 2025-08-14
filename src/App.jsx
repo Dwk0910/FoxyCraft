@@ -48,48 +48,52 @@ export default function App() {
 
     useEffect(() => {
         const run = async () => {
+            localStorage.removeItem("backend");
+
             const token = await window.api.getToken();
             let port = await window.api.getPort();
 
+            let i = 0;
             while (port === 'err') {
+                if (i >= 20) {
+                    break;
+                }
+
                 port = await window.api.getPort();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                i++;
             }
 
-            localStorage.setItem("backend", port);
-            setIsLoading(false);
+            i = 0;
+            while (port === 'err') {
+                port = await window.api.getPort();
 
-            // try {
-            //     // 1차검사
-            //     const response = await axios.post(`http://localhost:${port}/health`, {}, { timeout: 1200 });
-            //     if (response.status === 200 && response.data === token) {
-            //         setIsLoading(false);
-            //     }
-            // } catch (err) {
-            //     console.log("서버 연결 실패... 재검사 중 (20회)");
-            // }
-            //
-            // // 2차검사
-            // if (isLoading) {
-            //     for (let i = 0; i < 20; i++) {
-            //         const token = await window.api.getToken();
-            //         const port = await window.api.getPort();
-            //
-            //         localStorage.setItem("backend", port);
-            //
-            //         try {
-            //             const response = await axios.post(`http://localhost:${port}/health`, {}, {timeout: 1200});
-            //             await new Promise(resolve => setTimeout(resolve, 1200));
-            //             if (response.status === 200 && response.data === token) {
-            //                 setIsLoading(false);
-            //                 break;
-            //             }
-            //         } catch (ignored) {
-            //         }
-            //     }
-            // }
+                if (i >= 10) break;
+                try {
+                    // 이중검사
+                    const response = await axios.post(`http://localhost:${port}/health`, {}, { timeout: 1200 });
+                    if (response.status !== 200 || response.data !== token) {
+                        port = 'err';
+                    }
+                } catch (err) {
+                    port = 'err';
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                i++;
+            }
 
             // 서버찾기 실패
-            if (isLoading) setLoadingStatus("서버를 찾을 수 없습니다.");
+            if (port === 'err') setLoadingStatus(
+                <>
+                    서버를 찾을 수 없습니다. 다시 실행해 주세요.
+                    <br/>
+                    (문제가 반복되면 제보해 주세요.)
+                </>
+            ); else {
+                localStorage.setItem("backend", port);
+                setIsLoading(false);
+            }
         };
 
         void run();
@@ -142,27 +146,25 @@ export default function App() {
         );
     } else {
         // 로딩 창 출력
-        const scaleAnimation = `
-        @keyframes scaleAnimation {
-            0% { 
-                transform: scale(1);
-            }
-            
-            50% {
-                transform: scale(1.1);
-            }
-            
-            100% {
-                transform: scale(1);
-            }
-        }
-        `;
-
         return (
             <div className={"flex flex-col h-screen justify-center items-center"}>
-                <style>{scaleAnimation}</style>
+                <style>{`
+                    @keyframes scaleAnimation {
+                        0% { 
+                            transform: scale(1);
+                        }
+                        
+                        50% {
+                            transform: scale(1.1);
+                        }
+                        
+                        100% {
+                            transform: scale(1);
+                        }
+                    }
+                `}</style>
                 <img src={icon} className={"transition-all h-30"} style={{ animation: 'scaleAnimation infinite 3s ease-in-out' }} alt={"logo"}/>
-                <span className={"text-gray-400 font-suite text-[1.2rem]"}>{(loadingStatus) ? loadingStatus : ""}</span>
+                <span className={"text-gray-400 font-suite text-[1.2rem] text-center"}>{(loadingStatus) ? loadingStatus : ""}</span>
             </div>
         );
     }

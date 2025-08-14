@@ -20,12 +20,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
@@ -56,23 +54,24 @@ public class ServerCRUD {
                     return ResponseEntity.status(515).body("custom_runner");
                 Files.move(custom_runner.toPath(), Paths.get(path.toPath().toString(), File.separator, custom_runner.getName()), StandardCopyOption.REPLACE_EXISTING);
                 runner = new File(path.toPath() + File.separator + custom_runner.getName());
+            } else {
+                // 일반 구동기 사용
+                Util.RunnerInfo runnerInfo = FoxyCraft.runnerOriginMap.get(server.runner());
+                if (runnerInfo == null) return ResponseEntity.badRequest().build();
+                // runner 등록
+                runner = new File(path.toPath() + File.separator + server.runner() + ".jar");
+                Util.downloadFileFromURL(runnerInfo.url(), runner);
             }
 
-            // 일반 구동기 사용
-            Util.RunnerInfo runnerInfo = Util.runnerOriginMap.get(server.runner());
-            if (runnerInfo == null) return ResponseEntity.badRequest().build();
-            // runner 등록
-            runner = new File(path.toPath() + File.separator + server.runner() + ".jar");
-            Util.downloadFileFromURL(runnerInfo.url(), runner);
-
             serverList.put(new JSONObject()
+                    .put("UUID", uuid)
                     .put("name", server.name())
                     .put("runner", runner.toPath())
                     .put("port", server.port())
             );
 
-//            Util.writeToFile("serverlist.dat", serverList);
-//
+            // DB에 반영
+            Util.writeToFile("serverlist.dat", serverList);
 
         } catch (IOException e) {
             FoxyCraft.logger.error(e);

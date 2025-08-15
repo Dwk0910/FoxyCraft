@@ -7,7 +7,7 @@ import { MenuContext } from '../App';
 
 // func
 import clsx from "clsx";
-import getRunnerLicense from '../../func/getRunnerLicense';
+import getRunnerLicense from '../func/getRunnerLicense';
 
 // icons
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";

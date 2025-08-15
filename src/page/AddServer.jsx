@@ -1,8 +1,11 @@
 
 import $ from 'jquery';
-import { useState } from 'react';
-import { toast, ToastContainer } from "react-toastify";
 
+// native
+import { useState, useContext } from 'react';
+import { MenuContext } from '../App';
+
+// func
 import clsx from "clsx";
 import getRunnerLicense from '../../func/getRunnerLicense';
 
@@ -14,6 +17,9 @@ import { GoRepoTemplate } from "react-icons/go";
 import { TbWorldUpload } from "react-icons/tb";
 import { BsClipboardPlus } from "react-icons/bs";
 
+// page
+import ServerList from './ServerList';
+
 // pages (forms)
 import Template from "./form/AddServer/Template";
 import SaveLoc from "./form/AddServer/SaveLoc";
@@ -21,6 +27,7 @@ import PublishSetting from "./form/AddServer/PublishSetting";
 import AdditionalSettings from "./form/AddServer/AdditionalSettings";
 
 // components
+import { toast, ToastContainer } from "react-toastify";
 import { Steps, ConfigProvider, Modal, theme, Checkbox } from 'antd';
 const  { darkAlgorithm } = theme;
 import Form from '../component/AddServer/Form';
@@ -32,6 +39,7 @@ import { useAtom } from 'jotai';
 import { serverAtom } from "../jotai/serverAtom";
 
 export default function AddServer() {
+    const { changeMenu } = useContext(MenuContext);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {
@@ -186,7 +194,7 @@ export default function AddServer() {
                 custom_runner_path: server.custom_runner_path,
                 port: server.port,
                 servericon_path: server.servericon_path,
-                motd: server.motd,
+                motd: server.motd ? toUnicode(server.motd) : " ",
                 max_player: server.max_player,
                 online_mode: server.online_mode,
                 auto_backup: server.auto_backup,
@@ -196,6 +204,7 @@ export default function AddServer() {
             }),
             success: () => {
                 setLoading(false);
+                changeMenu(<ServerList/>);
             },
             error: err => {
                 console.error(err);

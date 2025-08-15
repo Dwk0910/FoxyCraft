@@ -1,13 +1,17 @@
 
 import axios from 'axios';
 
-import icon from './assets/images/icon.png';
+import { useState, useEffect, createContext, Suspense } from 'react';
 
-import { useState, useEffect, createContext } from 'react';
+import Loading from './component/Loading';
+
+// icons
+import icon from './assets/images/icon.png';
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { LuServer } from "react-icons/lu";
 import { FiPlus, FiSettings } from "react-icons/fi";
 
+// pages
 import Main from './page/Main';
 import ServerList from './page/ServerList';
 import AddServer from "./page/AddServer";
@@ -139,7 +143,9 @@ export default function App() {
                         </nav>
                     </div>
                     <div className={"pl-21 w-full min-h-screen transition-opacity duration-150 z-0 " + ((isAnimating) ? "opacity-0" : "opacity-100")} style={{ opacity }}>
-                        {currentMenu}
+                        <Suspense fallback={<Loading/>}>
+                            {currentMenu}
+                        </Suspense>
                     </div>
                 </div>
             </MenuContext.Provider>

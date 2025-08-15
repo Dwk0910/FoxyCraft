@@ -54,6 +54,7 @@ public class ServerCRUD {
             }
 
             File runner;
+            String jre;
 
             JSONArray serverList = Util.getContent("serverlist.dat", JSONArray.class);
             if (server.isCustom()) {
@@ -63,6 +64,10 @@ public class ServerCRUD {
                     return ResponseEntity.status(515).body("custom_runner");
                 Files.move(custom_runner.toPath(), Paths.get(path.toPath().toString(), File.separator, custom_runner.getName()), StandardCopyOption.REPLACE_EXISTING);
                 runner = new File(path.toPath() + File.separator + custom_runner.getName());
+
+                // 요청 JRE 검사
+                if (!FoxyCraft.compatibleJRE.contains(server.custom_jre())) return ResponseEntity.badRequest().body("custom_jre");
+                else jre = server.custom_jre();
             } else {
                 // 일반 구동기 사용
                 Util.RunnerInfo runnerInfo = FoxyCraft.runnerOriginMap.get(server.runner());
@@ -70,14 +75,24 @@ public class ServerCRUD {
                 // runner 등록
                 runner = new File(path.toPath() + File.separator + server.runner() + ".jar");
                 Util.downloadFileFromURL(runnerInfo.url(), runner);
+                jre = runnerInfo.reqJRE();
             }
 
+            // 객체 만들어서 리스트에 추가
             serverList.put(new JSONObject()
                     .put("UUID", uuid)
                     .put("name", server.name())
                     .put("runner", runner.toPath())
+                    .put("jre", jre)
                     .put("port", server.port())
             );
+
+            // 커스텀 서버 아이콘 사용
+            if (!server.servericon_path().isEmpty()) {
+                File f = new File(server.servericon_path());
+                if (!f.exists()) return ResponseEntity.status(515).body("servericon");
+                Files.move(f.toPath(), Paths.get(path.toPath() + File.separator + "server-icon.png"), StandardCopyOption.REPLACE_EXISTING);
+            }
 
             // DB에 반영
             Util.writeToFile("serverlist.dat", serverList);

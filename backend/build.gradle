@@ -30,6 +30,12 @@ run {
     mainClass = 'org.foxycraft.FoxyCraft'
 }
 
+bootRun {
+    if (project.hasProperty('dataPath')) {
+        jvmArgs = ["-DAPP_DATA_PATH=${project.property('dataPath')}"]
+    }
+}
+
 // 파일 옮기기 task (packaging에서 사용)
 tasks.register("copyBootJar", Copy) {
     dependsOn tasks.named('bootJar')
@@ -64,6 +70,7 @@ jar {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.apache.logging.log4j:log4j-bom:2.25.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.25.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.25.1'

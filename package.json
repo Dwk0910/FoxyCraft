@@ -69,16 +69,6 @@
     ],
     "directories": {
       "output": "release"
-    },
-    "win": {
-      "target": "msi",
-      "icon": "icon.png"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
-    "mac": {
-      "target": "dmg"
     }
   }
 }

@@ -121,6 +121,7 @@ app.on('ready', () => {
     const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
     if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
     const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}"`;
 
     let javaExecutable = "";
 
@@ -140,17 +141,17 @@ app.on('ready', () => {
         }
 
         log.info(`Starting Springboot App with ${javaExecutable}`);
-        javaProcess = spawn(javaExecutable, ["-jar", jarPath, datapath_argument]);
+        javaProcess = spawn(javaExecutable, [datapath_argument, "-jar", jarPath]);
     } else {
         // 개발 모드에서는 gradlew run 사용
 
         // mac에서는 gradlew
         if (process.platform === "darwin") {
-            javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun"], { cwd: path.join(__dirname, "backend")});
+            javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun", datapath_argument_dev], { cwd: path.join(__dirname, "backend")});
         }
         // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument} & exit"`);
+            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & pause & exit"`);
         }
     }
 
@@ -176,9 +177,7 @@ app.on('ready', () => {
         log.info(`JavaProcess exited with code ${code}`);
     });
 
-    setTimeout(() => {
-        createWindow();
-    }, 5000);
+    createWindow();
 });
 
 async function shutdown() {

@@ -141,7 +141,7 @@ app.on('ready', () => {
         }
 
         log.info(`Starting Springboot App with ${javaExecutable}`);
-        javaProcess = spawn(javaExecutable, ["-jar", jarPath, datapath_argument]);
+        javaProcess = spawn(javaExecutable, [datapath_argument, "-jar", jarPath]);
     } else {
         // 개발 모드에서는 gradlew run 사용
 
@@ -177,9 +177,7 @@ app.on('ready', () => {
         log.info(`JavaProcess exited with code ${code}`);
     });
 
-    setTimeout(() => {
-        createWindow();
-    }, 5000);
+    createWindow();
 });
 
 async function shutdown() {

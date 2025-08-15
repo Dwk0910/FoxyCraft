@@ -25,6 +25,7 @@ import { Steps, ConfigProvider, Modal, theme, Checkbox } from 'antd';
 const  { darkAlgorithm } = theme;
 import Form from '../component/AddServer/Form';
 import Header from "../component/Header";
+import Loading from '../component/Loading';
 
 // atom
 import { useAtom } from 'jotai';
@@ -162,16 +163,17 @@ export default function AddServer() {
         };
     };
 
-    const sendCreateRequest = () => {
+    const sendCreateRequest = async () => {
         // (마지막) 서버 추가 동작 (ajax요청 이후 toast띄우고 ServerList 페이지로 넘기기)
         // 유의 : MOTD의 경우 비어있을 때 공백문자를 넣어야 함. 안그럴 경우 오류 발생 가능성 있음
 
         // dialog닫고 로딩창 띄우기
         setDialogOpen(false);
+        setLoading(true);
 
         // ajax요청
         const backendport = localStorage.getItem("backend");
-        $.ajax({
+        await $.ajax({
             url: `http://localhost:${backendport}/servercrud/create`,
             type: "POST",
             contentType: "application/json",
@@ -192,13 +194,13 @@ export default function AddServer() {
                 auto_backup_max_count: server.auto_backup_max_count,
                 world_name: server.world_name
             }),
-            success: resp => {
-                console.log(resp);
+            success: () => {
+                setLoading(false);
             },
             error: err => {
-                console.log(err);
+                console.error(err);
             }
-        })
+        });
     };
 
     // 페이지 state
@@ -208,11 +210,12 @@ export default function AddServer() {
     const title = "text-white font-suite text-xl";
     const description = "text-gray-400 font-suite text-nowrap text-[1rem]";
 
-    // dialog 출력에서 사용
+    // Modal/dialog 출력에서 사용
     const [checked, setChecked] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogTitle, setDialogTitle] = useState("");
     const [dialogMessage, setDialogMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // 전송 시 사용 (motd를 readable unicode escape로 변경)
     const toUnicode = (inputString) => {
@@ -295,7 +298,8 @@ export default function AddServer() {
                             }
                         ]} current={server.step}/>
                     </div>
-                    {/*최종 경고창*/}
+                    {/*모달 정의*/}
+                    <Loading loadingState={loading}/>
                     <Modal
                         width={800}
                         title={<span className={"font-SeoulNamsanM text-[1.2rem]"}>라이선스 경고</span>}

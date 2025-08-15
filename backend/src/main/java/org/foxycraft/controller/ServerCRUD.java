@@ -1,6 +1,6 @@
 package org.foxycraft.controller;
 
-import org.apache.logging.log4j.core.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 import org.foxycraft.Util;
 import org.foxycraft.FoxyCraft;
@@ -31,6 +31,9 @@ import java.util.UUID;
 @RequestMapping("/servercrud")
 @RestController
 public class ServerCRUD {
+
+    // Add server actions
+
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody ServerCreateRequest server) {
         try {
@@ -39,7 +42,11 @@ public class ServerCRUD {
 
             // 서버 파일/폴더들 위치 확인
             File path = new File(server.path());
-            if (!path.exists()) FileUtils.mkdir(path, true);
+            if (!path.exists()) Files.createDirectory(path.toPath());
+            else {
+                // path 비우기
+                if (path.listFiles() != null) FileUtils.cleanDirectory(path);
+            }
 
             if (!server.servericon_path().isEmpty()) {
                 File servericon = new File(server.servericon_path());
@@ -75,11 +82,19 @@ public class ServerCRUD {
             // DB에 반영
             Util.writeToFile("serverlist.dat", serverList);
 
+            return ResponseEntity.ok().build();
         } catch (IOException e) {
             FoxyCraft.logger.error(e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
 
-        return null;
+    // Server information responses
+
+    @PostMapping("/get")
+    public JSONArray getServerList() {
+        // TODO: 모든 path에 들어가서 파일들이 다 살아있는지 확인하고 없으면 serverList에서 아예 지워버려야 함. (오류방지)
+        // TODO: 똑같은 서버 추가에 대해 방지하기 위한 중복억제 코드도 필요함
+        return new JSONArray();
     }
 }

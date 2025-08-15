@@ -127,7 +127,7 @@ app.on('ready', () => {
 
     if (app.isPackaged) {
         if (process.platform === "win32" && process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jre_win_64", "bin", "java.exe");
-        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "jre", "Contents", "Home", "bin", "java");
+        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "Contents", "Home", "bin", "java");
         else {
             // 지원하지 않는 OS/Architecture
             dialog.showMessageBoxSync({

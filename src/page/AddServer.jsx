@@ -397,10 +397,10 @@ export default function AddServer() {
                                               -> <페이지 넘기기>
                                          -> 통과하지 않았는가?
                                               -> 실패 toast 띄우기
-                                     -> 조건이 없는가?
+                                    -> 조건이 없는가?
                                          -> <페이지 넘기기>
                                 currentPage이 4(마지막 페이지)인가?
-                                     -> <서버 생성>
+                                    -> <서버 생성>
                                  */
                                 if (server.step <= 3) {
                                     // 페이지 넘기기 조건 확인

@@ -105,7 +105,7 @@ export default function App() {
 
     if (!isLoading) {
         return (
-            <MenuContext.Provider value={{ menu: currentMenu, changeMenu }}>
+            <menuContext.Provider value={{ menu: currentMenu, changeMenu }}>
                 <div className="flex flex-row min-h-screen">
                     <div className={"group/sidebar flex fixed flex-col transition-[width, shadow] ease-in-out bg-gray-700 border-r-2 border-gray-600 min-h-full items-start overflow-hidden pt-2 z-1 shadow-amber-50 sidebar " + ((isAnimating) ? "w-60" : "duration-300 w-20 hover:w-60")}>
                         <header className={"flex flex-col items-center cursor-pointer border-white w-full mt-2"}
@@ -148,7 +148,7 @@ export default function App() {
                         </Suspense>
                     </div>
                 </div>
-            </MenuContext.Provider>
+            </menuContext.Provider>
         );
     } else {
         // 로딩 창 출력
@@ -176,4 +176,4 @@ export default function App() {
     }
 }
 
-export const MenuContext = createContext(null);
+export const menuContext = createContext(null);

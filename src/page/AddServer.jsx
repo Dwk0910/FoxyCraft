@@ -3,7 +3,6 @@ import $ from 'jquery';
 
 // native
 import { useState, useContext } from 'react';
-import { MenuContext } from '../App';
 
 // func
 import clsx from "clsx";
@@ -35,12 +34,15 @@ import Form from '../component/AddServer/Form';
 import Header from "../component/Header";
 import Loading from '../component/Loading';
 
-// atom
+// store
 import { useAtom } from 'jotai';
 import { serverAtom } from "../jotai/serverAtom";
+import { menuContext } from '../App';
+import { serverContext } from './ServerList';
 
 export default function AddServer() {
-    const { changeMenu } = useContext(MenuContext);
+    const { changeMenu } = useContext(menuContext);
+    const { setCurrentServer } = useContext(serverContext);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {

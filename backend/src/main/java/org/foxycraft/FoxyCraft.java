@@ -33,7 +33,7 @@ public class FoxyCraft {
     public static List<String> compatibleJRE = new ArrayList<>();
     public static Map<String, File> fileList = new HashMap<>();
     public static Map<String, Util.RunnerInfo> runnerOriginMap = new HashMap<>();
-    public static OS env;
+    public static OS platform;
 
     static {
         File dataFolder = new File(dataPath);
@@ -71,9 +71,9 @@ public class FoxyCraft {
 
         // OS binding
         String osName = System.getProperty("os.name");
-        if (osName.contains("win")) env = OS.WIN;
-        else if (osName.contains("mac")) env = OS.MAC;
-        else env = OS.UNKNOWN;
+        if (osName.contains("win")) platform = OS.WIN;
+        else if (osName.contains("mac")) platform = OS.MAC;
+        else platform = OS.UNKNOWN;
     }
 
     public static void main(String[] args) {

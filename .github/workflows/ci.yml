@@ -29,7 +29,7 @@ jobs:
         run: |
           cd backend
           chmod +x gradlew
-          ./gradlew bootJar
+          ./gradlew bootJar -PdataPath="" -PresourcesPath=""
 
       - name: Install frontend dependency and check frontend build
         run: npm install && npm run build-react

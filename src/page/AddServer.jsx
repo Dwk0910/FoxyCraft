@@ -16,6 +16,7 @@ import { FiPlus } from "react-icons/fi";
 import { GoRepoTemplate } from "react-icons/go";
 import { TbWorldUpload } from "react-icons/tb";
 import { BsClipboardPlus } from "react-icons/bs";
+import { MdError } from "react-icons/md";
 
 // page
 import ServerList from './ServerList';
@@ -181,35 +182,38 @@ export default function AddServer() {
 
         // ajax요청
         const backendport = localStorage.getItem("backend");
-        await $.ajax({
-            url: `http://localhost:${backendport}/servercrud/create`,
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({
-                name: server.name,
-                path: server.path,
-                isCustom: server.custom,
-                runner: getRunnerFullName(server.runner),
-                custom_jre: server.custom_jre,
-                custom_runner_path: server.custom_runner_path,
-                port: server.port,
-                servericon_path: server.servericon_path,
-                motd: server.motd ? toUnicode(server.motd) : " ",
-                max_player: server.max_player,
-                online_mode: server.online_mode,
-                auto_backup: server.auto_backup,
-                auto_backup_period: server.auto_backup_period,
-                auto_backup_max_count: server.auto_backup_max_count,
-                world_name: server.world_name
-            }),
-            success: () => {
-                setLoading(false);
-                changeMenu(<ServerList/>);
-            },
-            error: err => {
-                console.error(err);
-            }
-        });
+        try {
+            await $.ajax({
+                url: `http://localhost:${backendport}/servercrud/create`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    name: server.name,
+                    path: server.path,
+                    isCustom: server.custom,
+                    runner: getRunnerFullName(server.runner),
+                    custom_jre: server.custom_jre,
+                    custom_runner_path: server.custom_runner_path,
+                    port: server.port,
+                    servericon_path: server.servericon_path,
+                    motd: server.motd ? toUnicode(server.motd) : " ",
+                    max_player: server.max_player,
+                    online_mode: server.online_mode,
+                    auto_backup: server.auto_backup,
+                    auto_backup_period: server.auto_backup_period,
+                    auto_backup_max_count: server.auto_backup_max_count,
+                    world_name: server.world_name
+                }),
+                success: () => {
+                    setLoading(false);
+                    changeMenu(<ServerList/>);
+                }
+            });
+        } catch (err) {
+            setLoading(false);
+            setErrormsg(err);
+            setErrorDialogOpen(true);
+        }
     };
 
     // 페이지 state
@@ -224,6 +228,8 @@ export default function AddServer() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogTitle, setDialogTitle] = useState("");
     const [dialogMessage, setDialogMessage] = useState("");
+    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+    const [errormsg, setErrormsg] = useState("");
     const [loading, setLoading] = useState(false);
 
     // 전송 시 사용 (motd를 readable unicode escape로 변경)
@@ -328,6 +334,28 @@ export default function AddServer() {
                         <div className={"flex flex-row absolute mt-1.5 pl-0.5"}>
                             <Checkbox checked={ checked } onChange={e => setChecked(e.target.checked)}/>
                             <span className={"font-suite text-[0.9rem] ml-3 cursor-pointer"} onClick={() => setChecked(prev => !prev)}>위 내용을 읽고 확인하였으며, 이에 동의합니다.</span>
+                        </div>
+                    </Modal>
+                    <Modal
+                        width={600}
+                        title={
+                            <div className={'flex flex-col'}>
+                                <div className={"flex flex-row items-center"}>
+                                    <MdError size={20} className={"mb-0.5 text-red-400"}/>
+                                    <span className={"ml-2 font-SeoulNamsanM text-[1.2rem]"}>오류</span>
+                                </div>
+                                <span className={"font-suite font-light text-gray-300 text-[0.9rem]"}>생성 동작 중 오류가 발생하였습니다. 계속될 시 개발자에게 문의해 주십시오.</span>
+                            </div>
+                        }
+                        open={errorDialogOpen}
+                        closable={false}
+                        footer={[
+                            <span className={"font-suite text-[1rem] bg-orange-400 pl-3 pr-3 pt-2 pb-2 rounded-[5px] transition-colors duration-250 cursor-pointer hover:bg-orange-500"} onClick={() => setErrorDialogOpen(false)}>확인</span>
+                        ]}
+                        centered
+                    >
+                        <div className={"bg-[#030C4A] border-gray-600 p-2 font-mono border-2 rounded-[5px]"}>
+                            { errormsg }
                         </div>
                     </Modal>
                 </ConfigProvider>

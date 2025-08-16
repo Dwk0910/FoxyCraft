@@ -4,12 +4,12 @@ import icon from '../assets/images/icon.png';
 import { useContext } from "react";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { FiPlus } from "react-icons/fi";
-import { MenuContext } from "../App";
+import { menuContext } from "../App";
 
 import AddServer from "./AddServer";
 
 export default function Main() {
-    const { changeMenu } = useContext(MenuContext);
+    const { changeMenu } = useContext(menuContext);
     return (
         <div className={"flex min-h-screen flex-col p-5"}>
             <div className={"flex flex-col justify-center items-center flex-grow"}>

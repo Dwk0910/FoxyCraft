@@ -55,8 +55,7 @@ const tokenFile = path.join(tempFolder, 'token.tk');
 // temp 폴더 없으면 새로 생성
 if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder);
 // 토큰 파일 생성 (이미 있으면 Override)
-let token = crypto.randomBytes(32).toString('base64url');
-fs.writeFileSync(tokenFile, token);
+fs.writeFileSync(tokenFile, "");
 
 // 백엔드 포트 구하기
 // 하나는 가지고 하나는 렌더러로 넘기기
@@ -65,6 +64,8 @@ let backendPort = 0;
 ipcMain.handle('getport', async () => {
     try {
         const str = fs.readFileSync(tokenFile, 'utf8').toString();
+        if (!str) return "err";
+
         backendPort = parseInt(str.split(".")[0]);
         if (isNaN(backendPort)) return 'err';
         return backendPort;
@@ -120,14 +121,14 @@ app.on('ready', () => {
     const jarPath = path.join(process.resourcesPath, 'FoxyCraft.jar');
     const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
     if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
-    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
-    const datapath_argument_dev = `-PdataPath="${dataFolderPath}"`;
+    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath} -DAPP_RESOURCES_PATH=${process.resourcesPath}`;
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}" -PresourcesPath="${process.resourcesPath}"`;
 
     let javaExecutable = "";
 
     if (app.isPackaged) {
         if (process.platform === "win32" && process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jre_win_64", "bin", "java.exe");
-        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "jre", "Contents", "Home", "bin", "java");
+        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "Contents", "Home", "bin", "java");
         else {
             // 지원하지 않는 OS/Architecture
             dialog.showMessageBoxSync({
@@ -151,7 +152,7 @@ app.on('ready', () => {
         }
         // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & pause & exit"`);
+            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & exit"`);
         }
     }
 
@@ -189,6 +190,9 @@ async function shutdown() {
         }).then(resp => {
             console.log(resp.data);
             if (process.platform !== "win32") javaProcess.kill();
+
+            // remove token file
+            fs.rmSync(tokenFile);
         }).catch(err => console.log(err));
     } catch (err) {
         console.log(err);

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,13 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
 @RequestMapping("/servercrud")
 @RestController
 public class ServerCRUD {
-
     // Add server actions
 
     @PostMapping("/create")
@@ -97,7 +99,7 @@ public class ServerCRUD {
             // DB에 반영
             Util.writeToFile("serverlist.dat", serverList);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(uuid.toString());
         } catch (IOException e) {
             FoxyCraft.logger.error(e);
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -107,9 +109,27 @@ public class ServerCRUD {
     // Server information responses
 
     @PostMapping("/get")
-    public JSONArray getServerList() {
-        // TODO: 모든 path에 들어가서 파일들이 다 살아있는지 확인하고 없으면 serverList에서 아예 지워버려야 함. (오류방지)
-        // TODO: 똑같은 서버 추가에 대해 방지하기 위한 중복억제 코드도 필요함
-        return new JSONArray();
+    public ResponseEntity<Map<String, Map<String, Object>>> getServerList() {
+        // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 반영 배열에 추가
+        Map<String, Map<String, Object>> result = new HashMap<>();
+        JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
+        JSONArray newArray = new JSONArray();
+        for (Object o : array) {
+            try {
+                JSONObject obj = new JSONObject(o.toString());
+                File runner = new File(obj.getString("runner"));
+                if (runner.exists()) {
+                    newArray.put(o);
+                    result.put(obj.getString("UUID"), obj.toMap());
+                }
+            } catch (JSONException ignored) {
+            }
+        }
+
+        // result 내용을 DB에 반영
+        Util.writeToFile("serverlist.dat", newArray);
+
+        // result 반환
+        return ResponseEntity.ok(result);
     }
 }

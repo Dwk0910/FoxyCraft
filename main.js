@@ -55,8 +55,7 @@ const tokenFile = path.join(tempFolder, 'token.tk');
 // temp 폴더 없으면 새로 생성
 if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder);
 // 토큰 파일 생성 (이미 있으면 Override)
-let token = crypto.randomBytes(32).toString('base64url');
-fs.writeFileSync(tokenFile, token);
+fs.writeFileSync(tokenFile, "");
 
 // 백엔드 포트 구하기
 // 하나는 가지고 하나는 렌더러로 넘기기
@@ -65,6 +64,8 @@ let backendPort = 0;
 ipcMain.handle('getport', async () => {
     try {
         const str = fs.readFileSync(tokenFile, 'utf8').toString();
+        if (!str) return "err";
+
         backendPort = parseInt(str.split(".")[0]);
         if (isNaN(backendPort)) return 'err';
         return backendPort;

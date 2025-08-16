@@ -36,13 +36,13 @@ import Loading from '../component/Loading';
 
 // store
 import { useAtom } from 'jotai';
+import { currentServerAtom } from '../jotai/serverListAtom';
 import { serverAtom } from "../jotai/serverAtom";
 import { menuContext } from '../App';
-import { serverContext } from './ServerList';
 
 export default function AddServer() {
     const { changeMenu } = useContext(menuContext);
-    const { setCurrentServer } = useContext(serverContext);
+    const [ignored, setCurrentServer] = useAtom(currentServerAtom);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {
@@ -206,8 +206,9 @@ export default function AddServer() {
                     auto_backup_max_count: server.auto_backup_max_count,
                     world_name: server.world_name
                 }),
-                success: () => {
+                success: (resp) => {
                     setLoading(false);
+                    setCurrentServer(resp);
                     changeMenu(<ServerList/>);
                 }
             });

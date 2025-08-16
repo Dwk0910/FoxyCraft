@@ -6,13 +6,15 @@ import Loading from '../component/Loading';
 
 // store & native
 import { menuContext } from '../App';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useAtom } from 'jotai';
+import { currentServerAtom } from '../jotai/serverListAtom';
 
 export default function ServerList() {
     const backendport = localStorage.getItem('backend');
-    const [ currentServer, setCurrentServer ] = useState(null);
-    const [ serverList, setServerList ] = useState([]);
+    const [ serverMap, setServerMap ] = useState({});
     const [ loading, setLoading ] = useState(true);
+    const [ currentServer, setCurrentServer ] = useAtom(currentServerAtom);
 
     const { menu } = useContext(menuContext);
 
@@ -25,7 +27,7 @@ export default function ServerList() {
             contentType: 'application/json',
             type: 'POST',
             success: resp => {
-                setServerList(resp);
+                setServerMap(resp);
                 setLoading(false);
             },
             error: err => {
@@ -40,14 +42,13 @@ export default function ServerList() {
     const Content = () => {
         if (currentServer) {
             return (
-                <serverContext.Provider value={{ setCurrentServer }}>
-                    <span className={"font-suite"}>{ serverList[currentServer].name }</span>
-                </serverContext.Provider>
+                <span className={"font-suite"}>{ serverMap[currentServer].name }</span>
             );
         } else {
             let result = [];
-            for (const item of serverList) {
-                result.push(<span key={item["UUID"]}>{item.name},</span>);
+            for (const key in serverMap) {
+                const item = serverMap[key];
+                result.push(<span key={key}>{item.name},</span>);
             }
             return result;
         }
@@ -59,5 +60,3 @@ export default function ServerList() {
         </div>
     );
 };
-
-export const serverContext = createContext(null);

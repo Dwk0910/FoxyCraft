@@ -26,7 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
@@ -98,7 +99,7 @@ public class ServerCRUD {
             // DB에 반영
             Util.writeToFile("serverlist.dat", serverList);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(uuid.toString());
         } catch (IOException e) {
             FoxyCraft.logger.error(e);
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -108,23 +109,27 @@ public class ServerCRUD {
     // Server information responses
 
     @PostMapping("/get")
-    public ResponseEntity<List<Object>> getServerList() {
-        // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 result에 추가
+    public ResponseEntity<Map<String, Map<String, Object>>> getServerList() {
+        // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 반영 배열에 추가
+        Map<String, Map<String, Object>> result = new HashMap<>();
         JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
-        JSONArray result = new JSONArray();
+        JSONArray newArray = new JSONArray();
         for (Object o : array) {
             try {
                 JSONObject obj = new JSONObject(o.toString());
                 File runner = new File(obj.getString("runner"));
-                if (runner.exists()) result.put(o);
+                if (runner.exists()) {
+                    newArray.put(o);
+                    result.put(obj.getString("UUID"), obj.toMap());
+                }
             } catch (JSONException ignored) {
             }
         }
 
         // result 내용을 DB에 반영
-        Util.writeToFile("serverlist.dat", result);
+        Util.writeToFile("serverlist.dat", newArray);
 
         // result 반환
-        return ResponseEntity.ok(result.toList());
+        return ResponseEntity.ok(result);
     }
 }

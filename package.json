@@ -46,24 +46,13 @@
     "productName": "FoxyCraft",
     "files": [
       "dist/**/*",
-      "resources/**/*",
       "main.js",
       "preload.js"
     ],
     "extraFiles": [
       {
-        "from": "resources/jre_mac",
-        "to": "resources/jre_mac",
-        "filter": "**/*"
-      },
-      {
-        "from": "resources/jre_win_64",
-        "to": "resources/jre_win_64",
-        "filter": "**/*"
-      },
-      {
-        "from": "resources/FoxyCraft.jar",
-        "to": "resources/FoxyCraft.jar",
+        "from": "resources/",
+        "to": "resources/",
         "filter": "**/*"
       }
     ],

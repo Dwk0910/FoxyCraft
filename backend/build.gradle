@@ -5,8 +5,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
-
-
 group = 'org.foxycraft'
 
 // 컴파일 세팅
@@ -31,9 +29,7 @@ run {
 }
 
 bootRun {
-    if (project.hasProperty('dataPath')) {
-        jvmArgs = ["-DAPP_DATA_PATH=${project.property('dataPath')}"]
-    }
+    jvmArgs = ["-DAPP_DATA_PATH=${project.property('dataPath')}", "-DAPP_RESOURCES_PATH=${project.property('resourcesPath')}"]
 }
 
 // 파일 옮기기 task (packaging에서 사용)
@@ -45,7 +41,6 @@ tasks.register("copyBootJar", Copy) {
 }
 
 tasks.named('bootJar') {
-
     it.finalizedBy(tasks.named("copyBootJar"))
 }
 

@@ -120,14 +120,14 @@ app.on('ready', () => {
     const jarPath = path.join(process.resourcesPath, 'FoxyCraft.jar');
     const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
     if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
-    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
-    const datapath_argument_dev = `-PdataPath="${dataFolderPath}"`;
+    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath} -DAPP_RESOURCES_PATH=${process.resourcesPath}`;
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}" -PresourcesPath="${process.resourcesPath}"`;
 
     let javaExecutable = "";
 
     if (app.isPackaged) {
         if (process.platform === "win32" && process.arch === "x64") javaExecutable = path.join(process.resourcesPath, "jre_win_64", "bin", "java.exe");
-        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "jre", "Contents", "Home", "bin", "java");
+        else if (process.platform === "darwin") javaExecutable = path.join(process.resourcesPath, "jre_mac", "Contents", "Home", "bin", "java");
         else {
             // 지원하지 않는 OS/Architecture
             dialog.showMessageBoxSync({

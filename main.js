@@ -151,7 +151,7 @@ app.on('ready', () => {
         }
         // win에서는 gradlew.bat (외부실행)
         else if (process.platform === "win32") {
-            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & pause & exit"`);
+            exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & exit"`);
         }
     }
 
@@ -189,6 +189,9 @@ async function shutdown() {
         }).then(resp => {
             console.log(resp.data);
             if (process.platform !== "win32") javaProcess.kill();
+
+            // remove token file
+            fs.rmSync(tokenFile);
         }).catch(err => console.log(err));
     } catch (err) {
         console.log(err);

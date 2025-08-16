@@ -120,8 +120,8 @@ app.on('ready', () => {
     const jarPath = path.join(process.resourcesPath, 'FoxyCraft.jar');
     const dataFolderPath = path.join(app.getPath("appData"), "foxycraft", "data");
     if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
-    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath}`;
-    const datapath_argument_dev = `-PdataPath="${dataFolderPath}"`;
+    const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath} -DAPP_RESOURCES_PATH=${process.resourcesPath}`;
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}" -PresourcesPath="${process.resourcesPath}"`;
 
     let javaExecutable = "";
 

@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.foxycraft.object.enums.OS;
 import static org.foxycraft.Util.writeToFile;
 
 import java.io.File;
@@ -28,9 +29,11 @@ public class FoxyCraft {
     public static File tempDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "foxycraft");
     public static File tokenFile = new File(tempDir.toPath() + File.separator + "token.tk");
     public static String dataPath = System.getProperty("APP_DATA_PATH");
+    public static String resourcesPath = System.getProperty("APP_RESOURCES_PATH");
     public static List<String> compatibleJRE = new ArrayList<>();
     public static Map<String, File> fileList = new HashMap<>();
     public static Map<String, Util.RunnerInfo> runnerOriginMap = new HashMap<>();
+    public static OS env;
 
     static {
         File dataFolder = new File(dataPath);
@@ -65,6 +68,12 @@ public class FoxyCraft {
         } catch (URISyntaxException | MalformedURLException e) {
             FoxyCraft.logger.error(e);
         }
+
+        // OS binding
+        String osName = System.getProperty("os.name");
+        if (osName.contains("win")) env = OS.WIN;
+        else if (osName.contains("mac")) env = OS.MAC;
+        else env = OS.UNKNOWN;
     }
 
     public static void main(String[] args) {

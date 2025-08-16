@@ -109,9 +109,6 @@ public class ServerCRUD {
 
     @PostMapping("/get")
     public ResponseEntity<List<Object>> getServerList() {
-        // TODO: 모든 path에 들어가서 파일들이 다 살아있는지 확인하고 없으면 serverList에서 아예 지워버려야 함. (오류방지)
-        // TODO: 똑같은 서버 추가에 대해 방지하기 위한 중복억제 코드도 필요함
-
         // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 result에 추가
         JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
         JSONArray result = new JSONArray();

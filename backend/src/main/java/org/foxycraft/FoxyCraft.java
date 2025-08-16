@@ -61,9 +61,12 @@ public class FoxyCraft {
             runnerOriginMap.putAll(Map.of(
                     "papermc-1.18.2", new Util.RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar").toURL(), "JRE17"),
                     "papermc-1.20.6", new Util.RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640/paper-1.20.6-151.jar").toURL(), "JRE17"),
-                    "papermc-1.21.8", new Util.RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/d310c61899acc608b683515c5c7ef929774bfd1b90262dac965e76c7e9ea8d22/paper-1.21.8-30.jar").toURL(), "JRE21")
+                    "papermc-1.21.8", new Util.RunnerInfo(new URI("https://fill-data.papermc.io/v1/objects/d310c61899acc608b683515c5c7ef929774bfd1b90262dac965e76c7e9ea8d22/paper-1.21.8-30.jar").toURL(), "JRE21"),
 
-                    // TODO: 나머지 구동기
+                    "mohist-1.7.10", new Util.RunnerInfo(new URI("https://api.mohistmc.com/project/mohist/1.7.10/builds/93/download").toURL(), "JRE8"),
+                    "mohist-1.12.2", new Util.RunnerInfo(new URI("https://api.mohistmc.com/project/mohist/1.12.2/builds/220/download").toURL(), "JRE8"),
+                    "mohist-1.16.5", new Util.RunnerInfo(new URI("https://api.mohistmc.com/project/mohist/1.16.5/builds/175/download").toURL(), "JRE11"),
+                    "mohist-1.18.2", new Util.RunnerInfo(new URI("https://api.mohistmc.com/project/mohist/1.18.2/builds/99/download").toURL(), "JRE17")
             ));
         } catch (URISyntaxException | MalformedURLException e) {
             FoxyCraft.logger.error(e);

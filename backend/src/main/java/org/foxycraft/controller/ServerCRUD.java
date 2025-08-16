@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,13 +26,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
 @RequestMapping("/servercrud")
 @RestController
 public class ServerCRUD {
-
     // Add server actions
 
     @PostMapping("/create")
@@ -107,9 +108,26 @@ public class ServerCRUD {
     // Server information responses
 
     @PostMapping("/get")
-    public JSONArray getServerList() {
+    public ResponseEntity<List<Object>> getServerList() {
         // TODO: 모든 path에 들어가서 파일들이 다 살아있는지 확인하고 없으면 serverList에서 아예 지워버려야 함. (오류방지)
         // TODO: 똑같은 서버 추가에 대해 방지하기 위한 중복억제 코드도 필요함
-        return new JSONArray();
+
+        // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 result에 추가
+        JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
+        JSONArray result = new JSONArray();
+        for (Object o : array) {
+            try {
+                JSONObject obj = new JSONObject(o.toString());
+                File runner = new File(obj.getString("runner"));
+                if (runner.exists()) result.put(o);
+            } catch (JSONException ignored) {
+            }
+        }
+
+        // result 내용을 DB에 반영
+        Util.writeToFile("serverlist.dat", result);
+
+        // result 반환
+        return ResponseEntity.ok(result.toList());
     }
 }

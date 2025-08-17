@@ -29,8 +29,9 @@ export default function App() {
     const [ isAnimating, setIsAnimating ] = useState(false);
     const [ opacity, setOpacity ] = useState(1);
 
-    const serverAtom_reset = useResetAtom(serverAtom);
     const [server, setServer] = useAtom(serverAtom);
+
+    const serverAtom_reset = useResetAtom(serverAtom);
 
     const changeMenu = (element) => {
         setOpacity(0);
@@ -142,7 +143,7 @@ export default function App() {
                             <span className={"transition-opacity font-SeoulNamsanB size-[1.5rem] mt-[3px] ml-6.5 w-full opacity-0 group-hover/sidebar:opacity-100"}>설정</span>
                         </nav>
                     </div>
-                    <div className={"pl-21 w-full min-h-screen transition-opacity duration-150 z-0 " + ((isAnimating) ? "opacity-0" : "opacity-100")} style={{ opacity }}>
+                    <div className={"pl-20 w-full min-h-screen transition-opacity duration-150 z-0 " + ((isAnimating) ? "opacity-0" : "opacity-100")} style={{ opacity }}>
                         <Suspense fallback={<Loading/>}>
                             {currentMenu}
                         </Suspense>

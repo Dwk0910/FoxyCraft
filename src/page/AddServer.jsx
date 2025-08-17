@@ -42,7 +42,7 @@ import { menuContext } from '../App';
 
 export default function AddServer() {
     const { changeMenu } = useContext(menuContext);
-    const [ignored, setCurrentServer] = useAtom(currentServerAtom);
+    const [, setCurrentServer] = useAtom(currentServerAtom);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {
@@ -326,7 +326,7 @@ export default function AddServer() {
                         okButtonProps={{ disabled: !checked }}
                         okText={<span className={"font-suite"}>동의</span>}
                         cancelText={<span className={"font-suite"}>취소</span>}
-                        onCancel={ignored => setDialogOpen(false)}
+                        onCancel={() => setDialogOpen(false)}
                         onOk={sendCreateRequest}
                         centered
                     >

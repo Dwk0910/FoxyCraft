@@ -13,11 +13,11 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.net.URL;
-import java.net.HttpURLConnection;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+
+import java.net.URL;
+import java.net.HttpURLConnection;
 
 public class Util {
     public record RunnerInfo(URL url, String reqJRE) {

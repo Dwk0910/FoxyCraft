@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -87,6 +88,7 @@ public class ServerCRUD {
                     .put("runner", runner.toPath())
                     .put("jre", jre)
                     .put("port", server.port())
+                    .put("status", "offline")
             );
 
             // 커스텀 서버 아이콘 사용
@@ -109,27 +111,47 @@ public class ServerCRUD {
     // Server information responses
 
     @PostMapping("/get")
-    public ResponseEntity<Map<String, Map<String, Object>>> getServerList() {
-        // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 반영 배열에 추가
-        Map<String, Map<String, Object>> result = new HashMap<>();
-        JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
-        JSONArray newArray = new JSONArray();
-        for (Object o : array) {
-            try {
-                JSONObject obj = new JSONObject(o.toString());
-                File runner = new File(obj.getString("runner"));
-                if (runner.exists()) {
-                    newArray.put(o);
-                    result.put(obj.getString("UUID"), obj.toMap());
+    public ResponseEntity<? extends Map<String, Object>> getServerList(@RequestParam("type") String type) {
+        switch (type) {
+            case "serverlist" -> {
+                // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 반영 배열에 추가
+                Map<String, Object> result = new HashMap<>();
+                JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
+                JSONArray newArray = new JSONArray();
+                for (Object o : array) {
+                    try {
+                        JSONObject obj = new JSONObject(o.toString());
+                        File runner = new File(obj.getString("runner"));
+                        if (runner.exists()) {
+                            newArray.put(o);
+                            result.put(obj.getString("UUID"), obj.toMap());
+                        }
+                    } catch (JSONException ignored) {
+                    }
                 }
-            } catch (JSONException ignored) {
+
+                // result 내용을 DB에 반영
+                Util.writeToFile("serverlist.dat", newArray);
+
+                // result 반환
+                return ResponseEntity.ok(result);
             }
+
+            case "status" -> {
+                // runner array
+                JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
+                Map<String, Object> statusMap = new HashMap<>();
+
+                // object내의 UUID를 key로, status를 value로 Map 만들어서 리턴
+                for (Object o : array) {
+                    JSONObject obj = new JSONObject(o.toString());
+                    statusMap.put(obj.getString("UUID"), obj.getString("status"));
+                }
+
+                return ResponseEntity.ok(statusMap);
+            }
+
+            default -> { return ResponseEntity.badRequest().build(); }
         }
-
-        // result 내용을 DB에 반영
-        Util.writeToFile("serverlist.dat", newArray);
-
-        // result 반환
-        return ResponseEntity.ok(result);
     }
 }

@@ -231,10 +231,10 @@ export default function Template() {
                         <Switch className={"w-[50px] scale-70"} value={ server.custom } onChange={(event) => setServer({...server, custom: event})}/>
                     </div>
                     {server.custom ? customForm : (
-                        <Cascader options={ runnerOptions } value={ server.runner } expandTrigger={"hover"} style={{ width: '100%', marginTop: '15px', height: '40px', fontFamily: 'suite', fontSize: '1.3rem' }} onChange={(value) => setServer({ ...server, runner: value })} placeholder={"서버 구동기를 선택해 주세요."}/>
+                        <Cascader options={ runnerOptions } value={ server["runner"] } expandTrigger={"hover"} style={{ width: '100%', marginTop: '15px', height: '40px', fontFamily: 'suite', fontSize: '1.3rem' }} onChange={(value) => setServer({ ...server, runner: value ? value : [] })} placeholder={"서버 구동기를 선택해 주세요."}/>
                     )}
-                    {(!server.custom && server.runner && getJVMVersion(server.runner)) && (
-                        <span className={"text-[0.9rem] font-suite text-gray-300 ml-2 mt-3"}>이 구동기로 연 서버는 {getJVMVersion(server.runner)}을 기반으로 동작할 것입니다.</span>
+                    {(!server.custom && server["runner"] && getJVMVersion(server["runner"])) && (
+                        <span className={"text-[0.9rem] font-suite text-gray-300 ml-2 mt-3"}>이 구동기로 연 서버는 {getJVMVersion(server["runner"])}을 기반으로 동작할 것입니다.</span>
                     )}
                 </div>
                 <div className={"flex flex-col w-full mr-3.5 mt-4 pl-3 pb-3 rounded-[5px]"}>

@@ -71,7 +71,7 @@ export default function AddServer() {
                         </div>
                         <div className={"flex flex-row items-center"}>
                             <span className={"text-gray-400 font-suite w-30 text-right"}>구동기 이름</span>
-                            <span className={"text-white ml-3"}>{ server.custom ? <NA/> : getRunnerFullName(server.runner) }</span>
+                            <span className={"text-white ml-3"}>{ server.custom ? <NA/> : getRunnerFullName(server["runner"]) }</span>
                         </div>
                         <div className={"flex flex-row items-center"}>
                             <span className={"text-gray-400 font-suite w-30 text-right"}>커스텀 구동기 사용</span>

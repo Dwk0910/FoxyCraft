@@ -7,6 +7,9 @@ import { FlatCompat } from "@eslint/eslintrc";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// plugins
+import react from 'eslint-plugin-react';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
@@ -23,6 +26,10 @@ export default defineConfig([globalIgnores([
     ".github/**",
     "release/**"
 ]), {
+    plugins: { react },
+    settings: {
+        react: { version: "detect" }
+    },
     extends: compat.extends("eslint:recommended", "plugin:react/recommended"),
 
     languageOptions: {
@@ -43,6 +50,8 @@ export default defineConfig([globalIgnores([
 
     rules: {
         semi: ["error", "always"],
-        "brace-style": ["error", "1tbs"],
+        "no-unused-vars": ["warn", { varsIgnorePattern: "^ignored$", argsIgnorePattern: "^ignored$", caughtErrorsIgnorePattern: "^ignored$" }],
+        "no-empty": "warn",
+        "brace-style": ["warn", "1tbs"]
     },
 }]);

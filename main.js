@@ -11,7 +11,6 @@ const { app, dialog, ipcMain, BrowserWindow } = require('electron');
 // other
 const { spawn, exec } = require('child_process');
 const axios = require('axios');
-const crypto = require('crypto');
 
 // clear log file
 const logFilePath = log.transports.file.getFile().path;
@@ -69,7 +68,7 @@ ipcMain.handle('getport', async () => {
         backendPort = parseInt(str.split(".")[0]);
         if (isNaN(backendPort)) return 'err';
         return backendPort;
-    } catch (err) {
+    } catch (ignored) {
         return 'err';
     }
 });
@@ -83,7 +82,7 @@ ipcMain.handle('isempty', async (event, path) => {
         } else {
             return false;
         }
-    } catch (err) {
+    } catch (ignored) {
         return false;
     }
 });
@@ -100,7 +99,7 @@ ipcMain.handle('selectfolder', async (event, defaultFolder) => {
         if (result.canceled) return { isErr: false, content: null };
         else if (files.length !== 0) return { isErr: true, content: "비어있는 폴더를 선택해주세요" };
         else return { isErr: false, content: result.filePaths[0] };
-    } catch (err) {
+    } catch (ignored) {
         return { isErr: false, content: null };
     }
 });
@@ -149,9 +148,8 @@ app.on('ready', () => {
         // mac에서는 gradlew
         if (process.platform === "darwin") {
             javaProcess = spawn(path.join(__dirname, "backend", "gradlew"), ["bootRun", datapath_argument_dev], { cwd: path.join(__dirname, "backend")});
-        }
-        // win에서는 gradlew.bat (외부실행)
-        else if (process.platform === "win32") {
+        } else if (process.platform === "win32") {
+            // win에서는 gradlew.bat (외부실행)
             exec(`cmd /c start cmd.exe /c "cd backend && .\\gradlew.bat bootRun ${datapath_argument_dev} & exit"`);
         }
     }

@@ -10,7 +10,7 @@
     "build-react": "vite build",
     "start-electron": "electron .",
     "build": "npm run build-react && electron-builder --dir",
-    "dev": "concurrently --kill-others --raw \"npm run line && npm run start-react\" \"wait-on http-get://localhost:5173/ && npm run start-electron\""
+    "dev": "concurrently --kill-others --raw \"npm run lint && npm run start-react\" \"wait-on http-get://localhost:5173/ && npm run start-electron\""
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",

@@ -4,7 +4,7 @@ import { ConfigProvider, theme } from "antd";
 export default function Form({ title, children }) {
     const { darkAlgorithm } = theme;
     return (
-        <div className={"w-full flex flex-col items-center mt-10 pl-10 pr-10"}>
+        <div className={'w-full flex flex-col items-center mt-10 pl-10 pr-10'}>
             <ConfigProvider theme={{
                 algorithm: darkAlgorithm,
                 token: {
@@ -17,4 +17,4 @@ export default function Form({ title, children }) {
             </ConfigProvider>
         </div>
     );
-}
+};

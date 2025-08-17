@@ -49,7 +49,7 @@ export default function App() {
             setIsAnimating(false);
             setOpacity(1);
         }, 150);
-    }
+    };
 
     useEffect(() => {
         const run = async () => {
@@ -80,7 +80,7 @@ export default function App() {
                     if (response.status !== 200 || response.data !== token) {
                         port = 'err';
                     }
-                } catch (err) {
+                } catch (ignored) {
                     port = 'err';
                 }
 

@@ -1,5 +1,5 @@
 
-import Form from '../../../component/AddServer/Form'
+import Form from '../../../component/AddServer/Form';
 
 // icon
 import { HiQuestionMarkCircle } from "react-icons/hi2";
@@ -24,7 +24,7 @@ export default function AdditionalSettings() {
 
     useEffect(() => {
         if (isNotAllowed(server.world_name)) {
-            void setServer(prev => ({...prev, custom_world_name_err: true}))
+            void setServer(prev => ({...prev, custom_world_name_err: true}));
             setOpacity(1);
         } else {
             void setServer(prev => ({...prev, custom_world_name_err: false}));

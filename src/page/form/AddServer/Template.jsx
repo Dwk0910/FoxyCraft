@@ -122,7 +122,7 @@ export default function Template() {
                     return rule.jvm;
                 }
             }
-        } catch (err) {
+        } catch (ignored) {
             return null;
         }
 

@@ -27,6 +27,7 @@ export default defineConfig([globalIgnores([
     "release/**"
 ]), {
     plugins: { react },
+    files: ["**/*.{js,jsx}"],
     settings: {
         react: { version: "detect" }
     },
@@ -38,20 +39,22 @@ export default defineConfig([globalIgnores([
             ...globals.node,
         },
 
-        ecmaVersion: "latest",
-        sourceType: "module",
-
         parserOptions: {
-            ecmaFeatures: {
-                jsx: true,
-            },
-        },
+            sourceType: "module",
+            ecmaVersion: "latest",
+            ecmaFeatures: { jsx: true }
+        }
     },
 
     rules: {
-        semi: ["error", "always"],
+        "semi": ["error", "always"],
         "no-unused-vars": ["warn", { varsIgnorePattern: "^ignored$", argsIgnorePattern: "^ignored$", caughtErrorsIgnorePattern: "^ignored$" }],
-        "no-empty": "warn",
-        "brace-style": ["warn", "1tbs"]
+        "no-empty": ["warn", { allowEmptyCatch: true }],
+        "brace-style": ["warn", "1tbs"],
+        // React 17+ features
+        "react/jsx-uses-react": "off",
+        "react/jsx-key": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/prop-types": "off"
     },
 }]);

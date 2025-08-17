@@ -5,7 +5,6 @@ import clsx from 'clsx';
 // component & pages
 import { ConfigProvider, Popover, theme } from "antd";
 import { motion } from 'framer-motion';
-import Loading from '../component/Loading';
 
 import AddServer from "./AddServer";
 
@@ -28,12 +27,14 @@ export default function ServerList() {
     const [ serverMap, setServerMap ] = useState({});
     const [ serverStatusMap, setServerStatusMap ] = useState({});
     const [ loading, setLoading ] = useState(true);
-    const [ currentServerID, setCurrentServerID ] = useAtom(currentServerAtom);
 
     const { menu, changeMenu } = useContext(menuContext);
 
     // set component visiblity
     const [opacity, setOpacity] = useState(1);
+
+    // atom for each servers
+    const [ currentServer, setCurrentServer ] = useAtom(currentServerAtom);
 
     // 초기로딩 or 새로고침
     useEffect(() => {
@@ -41,7 +42,8 @@ export default function ServerList() {
             setLoading(true);
 
             // atom 초기화
-            setCurrentServerID("");
+            // TODO: Dev
+            setCurrentServer({ id: "" });
 
             // 서버 리스트 불러오기
             await $.ajax({
@@ -75,7 +77,13 @@ export default function ServerList() {
     }, [menu]);
 
     // 로딩중이면 원초적으로 렌더링 안되게 막아야함
-    if (loading) return <Loading loadingState={loading} />;
+    if (loading) {
+        return (
+            <div className={"w-full h-full"}>
+                <span className={"font-suite text-gray-500"}>로딩 중입니다...</span>
+            </div>
+        );
+    }
 
     let array = [];
     for (const key in serverMap) {
@@ -87,7 +95,7 @@ export default function ServerList() {
         else if (serverStatusMap[key] === "pending") clr = "text-orange-500";
 
         array.push(
-            <div key={key} className={clsx("flex flex-row pl-0.5 items-center h-10 hover:bg-[#707070] cursor-pointer transition-colors duration-200", (currentServerID && currentServerID === key) && "bg-[#5E5E5E]")} onClick={() => changeServer(currentServerID ? "" : key)}>
+            <div key={key} className={clsx("flex flex-row pl-0.5 items-center h-10 hover:bg-[#707070] cursor-pointer transition-colors duration-200", (currentServer.id && currentServer.id === key) && "bg-[#5E5E5E]")} onClick={() => changeServer(currentServer.id ? "" : key)}>
                 <FaCircle className={"mt-0.5 ml-3 text-[0.7rem] " + clr}/>
                 <span className={"ml-2 text-ellipsis overflow-hidden w-55"}>{item.name}</span>
             </div>
@@ -97,18 +105,54 @@ export default function ServerList() {
     // Handle server change
     const changeServer = async (serv) => {
         setOpacity(0);
-        setTimeout(() => {
-            setCurrentServerID(() => (serv));
-            setOpacity(1);
-        }, 80);
+        await new Promise(resolve => setTimeout(resolve, 80));
+        setCurrentServer({ id: serv });
+        setOpacity(1);
     };
 
     // Content component
     const Content = () => {
-        if (currentServerID) {
-            const currentServer = serverMap[currentServerID];
+        if (currentServer.id) {
+            // title
+            const status = serverStatusMap[currentServer.id];
+            let statusTag;
+            if (status === "online") {
+                statusTag = (
+                    <>
+                        <FaCircle className={"text-[1rem] text-green-300"}/>
+                        <span className={"font-suite ml-2"}>온라인</span>
+                    </>
+                );
+            } else if (status === "pending") {
+                statusTag = (
+                    <>
+                        <FaCircle className={"text-[1rem] text-orange-500"}/>
+                        <span className={"font-suite ml-2"}>시작 중</span>
+                    </>
+                );
+            } else if (status === "offline") {
+                statusTag = (
+                    <>
+                        <FaCircle className={"text-[1rem] text-red-400"}/>
+                        <span className={"font-suite ml-2"}>오프라인</span>
+                    </>
+                );
+            }
+
+            const _currentServer = serverMap[currentServer.id];
             return (
-                <span>{ currentServer.name }</span>
+                <div className={"flex flex-col p-3 pl-6 pt-6"}>
+                    <div className={"flex flex-row items-center mb-[-5px]"}>{ statusTag }</div>
+                    <div className={"flex flex-row"}>
+                        <span className={"text-[1.4rem]"}>{ _currentServer.name }</span>
+                    </div>
+
+                    <div className={"w-full flex flex-col items-center mt-5"}>
+                        <div className={"bg-[#2A2A2A] font-mono w-full h-100 p-3 rounded-[5px] border-2 border-gray-600"}>
+                            Console log
+                        </div>
+                    </div>
+                </div>
             );
         } else {
             return (

@@ -66,9 +66,6 @@ bin/
 .vscode/
 
 /release
-package-lock.json
-/resources/jre_mac
-/resources/jre_win_64
 /backend/data
-resources/FoxyCraft.jar
-/resources/runnerjre
+/resources
+package-lock.json

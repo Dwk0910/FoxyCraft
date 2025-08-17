@@ -20,7 +20,7 @@ export default function Main() {
                 </span>
                 <div className={"flex flex-row mt-5"}>
                     <span className={"flex flex-row items-center transition-colors duration-150 ease-in-out bg-white hover:bg-gray-200 border-1 border-gray-400 text-gray-700 font-SeoulNamsanM text-[0.9rem] p-2 rounded-[5px] cursor-pointer"}><IoDocumentTextOutline className={"mb-1 mr-1"}/>튜토리얼 보기</span>
-                    <span className={"flex flex-row items-center transition-colors duration-150 ease-in-out bg-orange-400 hover:bg-orange-500 text-white font-SeoulNamsanM text-[0.9rem] p-2 rounded-[5px] ml-3 cursor-pointer"} onClick={() => {changeMenu(<AddServer/>)}}><FiPlus className={"mb-1 mr-1"}/>서버 생성하기</span>
+                    <span className={"flex flex-row items-center transition-colors duration-150 ease-in-out bg-orange-400 hover:bg-orange-500 text-white font-SeoulNamsanM text-[0.9rem] p-2 rounded-[5px] ml-3 cursor-pointer"} onClick={() => changeMenu(<AddServer/>)}><FiPlus className={"mb-1 mr-1"}/>서버 생성하기</span>
                 </div>
             </div>
         </div>

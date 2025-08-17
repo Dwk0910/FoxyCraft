@@ -42,7 +42,7 @@ import { menuContext } from '../App';
 
 export default function AddServer() {
     const { changeMenu } = useContext(menuContext);
-    const [ignored, setCurrentServer] = useAtom(currentServerAtom);
+    const [, setCurrentServer] = useAtom(currentServerAtom);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {
@@ -71,7 +71,7 @@ export default function AddServer() {
                         </div>
                         <div className={"flex flex-row items-center"}>
                             <span className={"text-gray-400 font-suite w-30 text-right"}>구동기 이름</span>
-                            <span className={"text-white ml-3"}>{ server.custom ? <NA/> : getRunnerFullName(server.runner) }</span>
+                            <span className={"text-white ml-3"}>{ server.custom ? <NA/> : getRunnerFullName(server["runner"]) }</span>
                         </div>
                         <div className={"flex flex-row items-center"}>
                             <span className={"text-gray-400 font-suite w-30 text-right"}>커스텀 구동기 사용</span>
@@ -326,7 +326,7 @@ export default function AddServer() {
                         okButtonProps={{ disabled: !checked }}
                         okText={<span className={"font-suite"}>동의</span>}
                         cancelText={<span className={"font-suite"}>취소</span>}
-                        onCancel={ignored => setDialogOpen(false)}
+                        onCancel={() => setDialogOpen(false)}
                         onOk={sendCreateRequest}
                         centered
                     >

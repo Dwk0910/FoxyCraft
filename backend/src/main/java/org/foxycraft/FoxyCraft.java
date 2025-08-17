@@ -37,7 +37,7 @@ public class FoxyCraft {
 
     static {
         File dataFolder = new File(dataPath);
-        if (!dataFolder.exists()) if(!dataFolder.mkdirs()) FoxyCraft.logger.error("data폴더 생성 실패");
+        if (!dataFolder.exists()) if (!dataFolder.mkdirs()) FoxyCraft.logger.error("data폴더 생성 실패");
 
         // create file instance
         File serverList = new File(dataPath + File.separator + "serverlist.dat");

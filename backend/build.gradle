@@ -29,7 +29,7 @@ run {
 }
 
 bootRun {
-    jvmArgs = ["-DAPP_DATA_PATH=${project.property('dataPath')}", "-DAPP_RESOURCES_PATH=${project.property('resourcesPath')}"]
+    if (project.hasProperty('dataPath') && project.hasProperty('resourcesPath')) jvmArgs = ["-DAPP_DATA_PATH=${project.property('dataPath')}", "-DAPP_RESOURCES_PATH=${project.property('resourcesPath')}"]
 }
 
 // 파일 옮기기 task (packaging에서 사용)

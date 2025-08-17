@@ -101,7 +101,7 @@ ipcMain.handle('selectfolder', async (event, defaultFolder) => {
         else if (files.length !== 0) return { isErr: true, content: "비어있는 폴더를 선택해주세요" };
         else return { isErr: false, content: result.filePaths[0] };
     } catch (err) {
-        return { isErr: false, content: null }
+        return { isErr: false, content: null };
     }
 });
 
@@ -113,7 +113,7 @@ ipcMain.handle('gethomefoler', () => {
 // 렌더러로 토큰 넘기기
 ipcMain.handle('gettoken', () => {
     return fs.readFileSync(path.join(os.tmpdir(), "foxycraft", "token.tk")).toString();
-})
+});
 
 // run new backend process
 let javaProcess = undefined;

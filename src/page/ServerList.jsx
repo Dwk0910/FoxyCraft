@@ -9,10 +9,11 @@ import { motion } from 'framer-motion';
 import AddServer from "./AddServer";
 
 // icons
-import { FaCircle } from "react-icons/fa";
-import { TbFolderPlus } from "react-icons/tb";
+import { TbFolderPlus, TbTriangleFilled, TbSquareFilled } from "react-icons/tb";
+import { IoFilterOutline, IoSettings } from "react-icons/io5";
+import { FaCircle} from "react-icons/fa";
+import { FaFloppyDisk } from "react-icons/fa6";
 import { FiPlus } from 'react-icons/fi';
-import { IoFilterOutline } from "react-icons/io5";
 import { LuServer } from 'react-icons/lu';
 
 // store & native
@@ -141,6 +142,21 @@ export default function ServerList() {
                         <span className={"text-[1.4rem]"}>{ _currentServer.name }</span>
                     </div>
 
+                    <div className={"flex flex-row mt-7 mb-5"}>
+                        <div className={clsx(serverStatusMap[currentServer.id] === "offline" && "bg-green-600 cursor-pointer hover:bg-green-700 text-white ", "bg-[#474747] text-gray-400 flex justify-start items-center p-2 w-30 font-suite rounded-[5px] transition-colors duration-200")}><TbTriangleFilled style={{ transform: "rotate(90deg)", marginLeft: "10px" }}/><span className={"ml-3"}>서버 시작</span></div>
+                        <div className={clsx(serverStatusMap[currentServer.id] !== "offline" && "bg-red-400 cursor-pointer hover:bg-red-500", "text-white bg-[#474747] flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 transition-colors duration-200")}><TbSquareFilled/></div>
+                        <div className={"bg-purple-400 text-white flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 cursor-pointer transition-colors duration-200 hover:bg-purple-500"}><FaFloppyDisk/></div>
+                        <div className={"bg-gray-500 text-white flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 cursor-pointer transition-colors duration-200 hover:bg-gray-600"}><IoSettings/></div>
+                    </div>
+
+                    <div className={"flex flex-row"}>
+                        <span className={""}>로그</span>
+                        <span className={"ml-3"}>플레이어</span>
+                        <span className={"ml-3"}>플러그인</span>
+                        <span className={"ml-3"}>백업</span>
+                        <span className={"ml-3"}>설정</span>
+                    </div>
+
                     <div className={"w-full flex flex-col items-center mt-5"}>
                         <div className={"bg-[#2A2A2A] font-mono w-full h-100 p-3 rounded-[5px] border-2 border-gray-600"}>
                             Console log
@@ -162,7 +178,7 @@ export default function ServerList() {
         <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
             <div className={"flex flex-row"}>
                 {/*Server Explorer*/}
-                <div className={"flex flex-col bg-[#474747] border-[#636363] border-r-1 w-70 h-screen"}>
+                <div className={"flex flex-col bg-[#474747] border-[#636363] border-r-1 w-85 h-screen"}>
                     <div className={"flex flex-row items-center w-full mb-3 mt-4"}>
                         <span className={"font-suite ml-7 grow"}>Server Explorer</span>
                     </div>

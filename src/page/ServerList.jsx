@@ -41,17 +41,19 @@ export default function ServerList() {
         async function run() {
             setLoading(true);
 
-            // atom 초기화
+            // atom/state 초기화
             // TODO: Dev
             setCurrentServer({ id: "" });
+            setServerMap({});
+            setServerStatusMap({});
 
             // 서버 리스트 불러오기
             await $.ajax({
                 url: `http://localhost:${backendport}/servercrud/get?type=serverlist`,
                 contentType: 'application/json',
                 type: 'POST',
-                success: resp => {
-                    setServerMap(resp);
+                success: async resp => {
+                    await setServerMap(resp);
                 },
                 error: err => {
                     console.error(err);
@@ -75,15 +77,6 @@ export default function ServerList() {
 
         void run();
     }, [menu]);
-
-    // 로딩중이면 원초적으로 렌더링 안되게 막아야함
-    if (loading) {
-        return (
-            <div className={"w-full h-full"}>
-                <span className={"font-suite text-gray-500"}>로딩 중입니다...</span>
-            </div>
-        );
-    }
 
     let array = [];
     for (const key in serverMap) {
@@ -186,7 +179,8 @@ export default function ServerList() {
                                 <TbFolderPlus className={"mt-1 mr-6 cursor-pointer hover:text-gray-300 transition-colors duration-200"}/>
                             </Popover>
                         </div>
-                        { array.length === 0 ? (<span className={"text-center mt-30 text-gray-400 font-suite"}>서버가 없습니다</span>) : array }
+                        { (!array || array?.length <= 0) && !loading ? (<div className={"text-center mt-30 text-gray-400 font-suite w-63.5"}>서버가 없습니다</div>) : array }
+                        { loading ? (<div className="text-center mt-30 text-gray-400 font-suite w-63.5">로딩 중입니다...</div>) : ""}
                     </div>
                 </div>
 

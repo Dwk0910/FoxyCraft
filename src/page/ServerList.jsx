@@ -11,10 +11,10 @@ import AddServer from "./AddServer";
 // icons
 import { TbFolderPlus, TbTriangleFilled, TbSquareFilled } from "react-icons/tb";
 import { IoFilterOutline, IoSettings } from "react-icons/io5";
-import { FaCircle} from "react-icons/fa";
-import { FaFloppyDisk } from "react-icons/fa6";
-import { FiPlus } from 'react-icons/fi';
+import { FaFloppyDisk, FaArrowUp } from "react-icons/fa6";
 import { LuServer } from 'react-icons/lu';
+import { FaCircle } from "react-icons/fa";
+import { FiPlus } from 'react-icons/fi';
 
 // store & native
 import { menuContext } from '../App';
@@ -101,7 +101,7 @@ export default function ServerList() {
     const changeServer = async (serv) => {
         setOpacity(0);
         await new Promise(resolve => setTimeout(resolve, 80));
-        setCurrentServer({ id: serv });
+        setCurrentServer({ ...currentServer, id: serv });
         setOpacity(1);
     };
 
@@ -136,7 +136,7 @@ export default function ServerList() {
 
             const _currentServer = serverMap[currentServer.id];
             return (
-                <div className={"flex flex-col p-3 pl-6 pt-6"}>
+                <div className={"flex flex-col h-full p-6"}>
                     <div className={"flex flex-row items-center mb-[-5px]"}>{ statusTag }</div>
                     <div className={"flex flex-row"}>
                         <span className={"text-[1.4rem]"}>{ _currentServer.name }</span>
@@ -149,17 +149,24 @@ export default function ServerList() {
                         <div className={"bg-gray-500 text-white flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 cursor-pointer transition-colors duration-200 hover:bg-gray-600"}><IoSettings/></div>
                     </div>
 
-                    <div className={"flex flex-row"}>
-                        <span className={""}>로그</span>
-                        <span className={"ml-3"}>플레이어</span>
-                        <span className={"ml-3"}>플러그인</span>
-                        <span className={"ml-3"}>백업</span>
-                        <span className={"ml-3"}>설정</span>
+                    <div className={"flex flex-row ml-0.5"}>
+                        <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "console" })}>로그</span>
+                        <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "player" })}>플레이어</span>
+                        <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "plugin"})}>플러그인</span>
+                        <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "mods" })}>모드</span>
+                        <span className={clsx(currentServer.menu === "backup" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "backup" })}>백업</span>
+                        <span className={clsx(currentServer.menu === "settings" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "settings" })}>설정</span>
                     </div>
 
-                    <div className={"w-full flex flex-col items-center mt-5"}>
-                        <div className={"bg-[#2A2A2A] font-mono w-full h-100 p-3 rounded-[5px] border-2 border-gray-600"}>
+                    <div className={"w-full h-full flex flex-col items-center mt-5"}>
+                        <div className={"bg-[#2A2A2A] select-text font-mono w-full h-full p-3 mb-2 rounded-[5px] border-2 border-gray-600"}>
                             Console log
+                        </div>
+                        <div className={"w-full flex flex-row items-center"}>
+                            <input type={"text"} className={"bg-[#2A2A2A] mb-3 w-full px-3 h-10 border-2 border-gray-600 rounded-[5px] font-mono"} placeholder={"Command Prompt Here"}/>
+                            <div className={"mb-3 ml-3 p-2 bg-[#2A2A2A] border-gray-600 border-2 rounded-[5px] transition-colors duration-200 cursor-pointer hover:bg-gray-700"}>
+                                <FaArrowUp className={"w-5 h-5"}/>
+                            </div>
                         </div>
                     </div>
                 </div>

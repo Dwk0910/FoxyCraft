@@ -11,3 +11,6 @@ export const currentServerAtom = atom(get => get(baseAtom), (get, set, args) => 
     if (!args.menu) args = {...args, menu: "console"};
     set(baseAtom, args);
 });
+
+export const serverMapAtom = atom({});
+export const serverStatusMapAtom = atom({});

@@ -19,13 +19,11 @@ import { LuServer } from 'react-icons/lu';
 import { menuContext } from '../App';
 import { useState, useEffect, useContext } from 'react';
 import { useAtom } from 'jotai';
-import { currentServerAtom } from '../jotai/serverListAtom';
+import { currentServerAtom, serverMapAtom, serverStatusMapAtom } from '../jotai/serverListAtom';
 
 export default function ServerList() {
     // global
     const backendport = localStorage.getItem('backend');
-    const [ serverMap, setServerMap ] = useState({});
-    const [ serverStatusMap, setServerStatusMap ] = useState({});
     const [ loading, setLoading ] = useState(true);
 
     const { menu, changeMenu } = useContext(menuContext);
@@ -35,6 +33,8 @@ export default function ServerList() {
 
     // atom for each servers
     const [ currentServer, setCurrentServer ] = useAtom(currentServerAtom);
+    const [ serverMap, setServerMap ] = useAtom(serverMapAtom);
+    const [ serverStatusMap, setServerStatusMap ] = useAtom(serverStatusMapAtom);
 
     // 초기로딩 or 새로고침
     useEffect(() => {
@@ -42,10 +42,11 @@ export default function ServerList() {
             setLoading(true);
 
             // atom/state 초기화
+
             // TODO: Dev
-            setCurrentServer({ id: "" });
-            setServerMap({});
-            setServerStatusMap({});
+            // setCurrentServer({ id: "" });
+            // setServerMap({});
+            // setServerStatusMap({});
 
             // 서버 리스트 불러오기
             await $.ajax({
@@ -88,7 +89,7 @@ export default function ServerList() {
         else if (serverStatusMap[key] === "pending") clr = "text-orange-500";
 
         array.push(
-            <div key={key} className={clsx("flex flex-row pl-0.5 items-center h-10 hover:bg-[#707070] cursor-pointer transition-colors duration-200", (currentServer.id && currentServer.id === key) && "bg-[#5E5E5E]")} onClick={() => changeServer(currentServer.id ? "" : key)}>
+            <div key={key} className={clsx("flex flex-row pl-0.5 items-center h-10 hover:bg-[#707070] cursor-pointer transition-colors duration-200", (currentServer.id && currentServer.id === key) && "bg-[#5E5E5E]")} onClick={() => changeServer(currentServer.id === key ? "" : key)}>
                 <FaCircle className={"mt-0.5 ml-3 text-[0.7rem] " + clr}/>
                 <span className={"ml-2 text-ellipsis overflow-hidden w-55"}>{item.name}</span>
             </div>

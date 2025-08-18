@@ -24,6 +24,12 @@ if (fs.existsSync(logFilePath)) {
     }
 }
 
+// 렌더러에서 로깅하는거 받고 파일에 기록하기
+ipcMain.on("log", (event, { level, msg }) => {
+    log[level](msg);
+});
+
+// window 생성
 let window;
 function createWindow() {
     window = new BrowserWindow({

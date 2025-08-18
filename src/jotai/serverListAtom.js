@@ -8,7 +8,8 @@ const defaultObj = {
 
 const baseAtom = atom(defaultObj);
 export const currentServerAtom = atom(get => get(baseAtom), (get, set, args) => {
-    if (!args.menu) args = {...args, menu: "console"};
+    const prev = get(baseAtom);
+    if (!args.menu || prev.id !== args.id) args = {...args, menu: "console"};
     set(baseAtom, args);
 });
 

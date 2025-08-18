@@ -42,7 +42,7 @@ import { menuContext } from '../App';
 
 export default function AddServer() {
     const { changeMenu } = useContext(menuContext);
-    const [, setCurrentServer] = useAtom(currentServerAtom);
+    const [currentServer, setCurrentServer] = useAtom(currentServerAtom);
     const [server, setServer] = useAtom(serverAtom);
 
     const getRunnerFullName = (runner) => {
@@ -208,7 +208,7 @@ export default function AddServer() {
                 }),
                 success: (resp) => {
                     setLoading(false);
-                    setCurrentServer(resp);
+                    setCurrentServer({ ...currentServer, id: resp });
                     changeMenu(<ServerList/>);
                 }
             });

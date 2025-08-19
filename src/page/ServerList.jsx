@@ -6,12 +6,14 @@ import clsx from 'clsx';
 import { ConfigProvider, Popover, theme } from "antd";
 import { motion } from 'framer-motion';
 
+import Console from "./form/ServerList/Console";
+import Player from './form/ServerList/Player';
 import AddServer from "./AddServer";
 
 // icons
 import { TbFolderPlus, TbTriangleFilled, TbSquareFilled } from "react-icons/tb";
 import { IoFilterOutline, IoSettings } from "react-icons/io5";
-import { FaFloppyDisk, FaArrowUp } from "react-icons/fa6";
+import { FaFloppyDisk } from "react-icons/fa6";
 import { LuServer } from 'react-icons/lu';
 import { FaCircle } from "react-icons/fa";
 import { FiPlus } from 'react-icons/fi';
@@ -31,6 +33,8 @@ export default function ServerList() {
 
     // set component visiblity
     const [opacity, setOpacity] = useState(1);
+    const [component, setComponent] = useState(null);
+    const [componentOpacity, setComponentOpacity] = useState(1);
 
     // atom for each servers
     const [ currentServer, setCurrentServer ] = useAtom(currentServerAtom);
@@ -79,6 +83,12 @@ export default function ServerList() {
 
         void run();
     }, [menu]);
+
+    // Server Explorer에서 서버 변경시 호출
+    useEffect(() => {
+        // 기본 menu는 Console
+        setComponent(<Console serverUUID={currentServer.id}/>);
+    }, [currentServer.id]);
 
     let array = [];
     for (const key in serverMap) {
@@ -134,6 +144,18 @@ export default function ServerList() {
                 );
             }
 
+            /*
+            currentServer : 렌더러 내에서 컴포넌트 렌더링을 위해 필요한 정보를 담고 있음. (현재 서버의 UUID와 선택된 메뉴의 이름)
+            _currentServer : 백엔드로부터 가져온 서버 정보를 그대로 담고 있음
+             */
+            const changeComponent = async (target, targetComponent) => {
+                await setComponentOpacity(0);
+                setComponent(targetComponent);
+                await new Promise(resolve => setTimeout(resolve, 80));
+                setCurrentServer({...currentServer, menu: target});
+                setComponentOpacity(1);
+            };
+
             const _currentServer = serverMap[currentServer.id];
             return (
                 <div className={"flex flex-col h-full p-6"}>
@@ -150,25 +172,17 @@ export default function ServerList() {
                     </div>
 
                     <div className={"flex flex-row ml-0.5"}>
-                        <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "console" })}>로그</span>
-                        <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "player" })}>플레이어</span>
-                        <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "plugin"})}>플러그인</span>
-                        <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "mods" })}>모드</span>
-                        <span className={clsx(currentServer.menu === "backup" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "backup" })}>백업</span>
-                        <span className={clsx(currentServer.menu === "settings" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => setCurrentServer({ ...currentServer, menu: "settings" })}>설정</span>
+                        <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('console', <Console serverUUID={currentServer.id}/>)}>로그</span>
+                        <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('player', <Player/>)}>플레이어</span>
+                        <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('plugin')}>플러그인</span>
+                        <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('mods')}>모드</span>
+                        <span className={clsx(currentServer.menu === "backup" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('backup')}>백업</span>
+                        <span className={clsx(currentServer.menu === "settings" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('settings')}>설정</span>
                     </div>
 
-                    <div className={"w-full h-full flex flex-col items-center mt-5"}>
-                        <div className={"bg-[#2A2A2A] select-text font-mono w-full h-full p-3 mb-2 rounded-[5px] border-2 border-gray-600"}>
-                            Console log
-                        </div>
-                        <div className={"w-full flex flex-row items-center"}>
-                            <input type={"text"} className={"bg-[#2A2A2A] mb-3 w-full px-3 h-10 border-2 border-gray-600 rounded-[5px] font-mono"} placeholder={"Command Prompt Here"}/>
-                            <div className={"mb-3 ml-3 p-2 bg-[#2A2A2A] border-gray-600 border-2 rounded-[5px] transition-colors duration-200 cursor-pointer hover:bg-gray-700"}>
-                                <FaArrowUp className={"w-5 h-5"}/>
-                            </div>
-                        </div>
-                    </div>
+                    <motion.div className={"w-full h-full flex flex-col items-center mt-5"} initial={{ opacity: 0 }} animate={{ opacity: componentOpacity }} transition={{ duration: 0.08, ease: "easeInOut" }}>
+                        { component }
+                    </motion.div>
                 </div>
             );
         } else {
@@ -216,3 +230,4 @@ export default function ServerList() {
         </ConfigProvider>
     );
 };
+

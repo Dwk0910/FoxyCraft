@@ -6,9 +6,15 @@ import clsx from 'clsx';
 import { ConfigProvider, Popover, theme } from "antd";
 import { motion } from 'framer-motion';
 
+import AddServer from "./AddServer";
+
+// menu components
 import Console from "./form/ServerList/Console";
 import Player from './form/ServerList/Player';
-import AddServer from "./AddServer";
+import Plugin from './form/ServerList/Plugin';
+import Mods from './form/ServerList/Mods';
+import Backup from './form/ServerList/Backup';
+import Settings from './form/ServerList/Settings';
 
 // icons
 import { TbFolderPlus, TbTriangleFilled, TbSquareFilled } from "react-icons/tb";
@@ -174,10 +180,10 @@ export default function ServerList() {
                     <div className={"flex flex-row ml-0.5"}>
                         <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('console', <Console serverUUID={currentServer.id}/>)}>로그</span>
                         <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('player', <Player/>)}>플레이어</span>
-                        <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('plugin')}>플러그인</span>
-                        <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('mods')}>모드</span>
-                        <span className={clsx(currentServer.menu === "backup" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('backup')}>백업</span>
-                        <span className={clsx(currentServer.menu === "settings" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('settings')}>설정</span>
+                        <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('plugin', <Plugin/>)}>플러그인</span>
+                        <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('mods', <Mods/>)}>모드</span>
+                        <span className={clsx(currentServer.menu === "backup" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('backup', <Backup/>)}>백업</span>
+                        <span className={clsx(currentServer.menu === "settings" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('settings', <Settings/>)}>설정</span>
                     </div>
 
                     <motion.div className={"w-full h-full flex flex-col items-center mt-5"} initial={{ opacity: 0 }} animate={{ opacity: componentOpacity }} transition={{ duration: 0.08, ease: "easeInOut" }}>

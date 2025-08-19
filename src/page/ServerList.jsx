@@ -18,11 +18,12 @@ import Settings from './form/ServerList/Settings';
 
 // icons
 import { TbFolderPlus, TbTriangleFilled, TbSquareFilled } from "react-icons/tb";
-import { IoFilterOutline, IoSettings } from "react-icons/io5";
+import { IoFilterOutline, IoSettings, IoPeople } from "react-icons/io5";
+import { FiPlus, FiCpu } from 'react-icons/fi';
 import { FaFloppyDisk } from "react-icons/fa6";
+import { RiRamLine } from "react-icons/ri";
 import { LuServer } from 'react-icons/lu';
 import { FaCircle } from "react-icons/fa";
-import { FiPlus } from 'react-icons/fi';
 
 // store & native
 import { menuContext } from '../App';
@@ -93,7 +94,7 @@ export default function ServerList() {
     // Server Explorer에서 서버 변경시 호출
     useEffect(() => {
         // 기본 menu는 Console
-        setComponent(<Console serverUUID={currentServer.id}/>);
+        if (currentServer.id) setComponent(<Console serverUUID={currentServer.id}/>);
     }, [currentServer.id]);
 
     let array = [];
@@ -103,7 +104,7 @@ export default function ServerList() {
         let clr = "";
         if (serverStatusMap[key] === "online") clr = "text-green-300";
         else if (serverStatusMap[key] === "offline") clr = "text-red-400";
-        else if (serverStatusMap[key] === "pending") clr = "text-orange-500";
+        else if (serverStatusMap[key] === "pending") clr = "text-yellow-500";
 
         array.push(
             <div key={key} className={clsx("flex flex-row pl-0.5 items-center h-10 hover:bg-[#707070] cursor-pointer transition-colors duration-200", (currentServer.id && currentServer.id === key) && "bg-[#5E5E5E]")} onClick={() => changeServer(currentServer.id === key ? "" : key)}>
@@ -113,12 +114,21 @@ export default function ServerList() {
         );
     }
 
+    // OnClick handlers
+
     // Handle server change
     const changeServer = async (serv) => {
         setOpacity(0);
         await new Promise(resolve => setTimeout(resolve, 80));
         setCurrentServer({ ...currentServer, id: serv });
         setOpacity(1);
+    };
+
+    // Handle server open request
+    const openServer = async (serverID) => {
+        if (serverStatusMap[serverID] === "offline") {
+            setServerStatusMap(prev => ({...prev, [serverID]: "pending"}));
+        }
     };
 
     // Content component
@@ -137,7 +147,7 @@ export default function ServerList() {
             } else if (status === "pending") {
                 statusTag = (
                     <>
-                        <FaCircle className={"text-[1rem] text-orange-500"}/>
+                        <FaCircle className={"text-[1rem] text-yellow-500"}/>
                         <span className={"font-suite ml-2"}>시작 중</span>
                     </>
                 );
@@ -171,13 +181,32 @@ export default function ServerList() {
                     </div>
 
                     <div className={"flex flex-row mt-7 mb-5"}>
-                        <div className={clsx(serverStatusMap[currentServer.id] === "offline" && "bg-green-600 cursor-pointer hover:bg-green-700 text-white ", "bg-[#474747] text-gray-400 flex justify-start items-center p-2 w-30 font-suite rounded-[5px] transition-colors duration-200")}><TbTriangleFilled style={{ transform: "rotate(90deg)", marginLeft: "10px" }}/><span className={"ml-3"}>서버 시작</span></div>
-                        <div className={clsx(serverStatusMap[currentServer.id] !== "offline" && "bg-red-400 cursor-pointer hover:bg-red-500", "text-white bg-[#474747] flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 transition-colors duration-200")}><TbSquareFilled/></div>
+                        <div className={clsx(serverStatusMap[currentServer.id] === "offline" && "bg-green-600 cursor-pointer hover:bg-green-700 text-white ", "bg-[#474747] text-gray-400 flex justify-start items-center p-2 w-30 font-suite rounded-[5px] transition-all duration-200")} onClick={() => openServer(currentServer.id)}><TbTriangleFilled style={{ transform: "rotate(90deg)", marginLeft: "10px" }}/><span className={"ml-3"}>서버 시작</span></div>
+                        <div className={clsx(serverStatusMap[currentServer.id] !== "offline" && "bg-red-400 cursor-pointer hover:bg-red-500", "text-white bg-[#474747] flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 transition-all duration-200")}><TbSquareFilled/></div>
                         <div className={"bg-purple-400 text-white flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 cursor-pointer transition-colors duration-200 hover:bg-purple-500"}><FaFloppyDisk/></div>
                         <div className={"bg-gray-500 text-white flex justify-center items-center p-2 w-10 font-suite rounded-[5px] ml-3 cursor-pointer transition-colors duration-200 hover:bg-gray-600"}><IoSettings/></div>
+                        <div className={"flex justify-center items-center text-gray-400 ml-3"}>
+                            <IoPeople className={"text-[1.2rem] mt-0.5 ml-3"}/>
+                        </div>
+                        <div className={"flex items-end pb-[7px]"}>
+                            <span className={"ml-2 text-white font-suite"}>310</span>
+                            <span className={"text-gray-300 ml-1 text-[0.8rem] font-suite"}>/50</span>
+                        </div>
+                        <div className={"flex justify-center items-center text-gray-400 ml-3"}>
+                            <FiCpu className={"text-[1.2rem] mt-0.5 ml-3"}/>
+                        </div>
+                        <div className={"flex items-end pb-[7px]"}>
+                            <span className={"ml-2 text-white font-suite"}>{"50"}%</span>
+                        </div>
+                        <div className={"flex justify-center items-center text-gray-400 ml-3"}>
+                            <RiRamLine className={"text-[1.2rem] mt-0.5 ml-3"}/>
+                        </div>
+                        <div className={"flex items-end pb-[7px]"}>
+                            <span className={"ml-2 text-white font-suite"}>{"770"}MB</span>
+                        </div>
                     </div>
 
-                    <div className={"flex flex-row ml-0.5"}>
+                    <div className={"flex flex-row ml-0.5 mt-3"}>
                         <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('console', <Console serverUUID={currentServer.id}/>)}>로그</span>
                         <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('player', <Player/>)}>플레이어</span>
                         <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('plugin', <Plugin/>)}>플러그인</span>

@@ -48,6 +48,39 @@ export default function ServerList() {
     const [ serverMap, setServerMap ] = useAtom(serverMapAtom);
     const [ serverStatusMap, setServerStatusMap ] = useAtom(serverStatusMapAtom);
 
+    // loading methods
+    // serverList
+    async function loadServerList() {
+        // 서버 리스트 불러오기
+        await $.ajax({
+            url: `http://localhost:${backendport}/servercrud/get?type=serverlist`,
+            contentType: 'application/json',
+            type: 'POST',
+            success: async resp => {
+                await setServerMap(resp);
+            },
+            error: err => {
+                console.error(err);
+            }
+        });
+    }
+
+    // server status
+    async function loadServerStatus() {
+        await $.ajax({
+            url: `http://localhost:${backendport}/servercrud/get?type=status`,
+            contentType: 'application/json',
+            type: 'POST',
+            success: resp => {
+                setServerStatusMap(resp);
+                setLoading(false);
+            },
+            error: err => {
+                console.error(err);
+            }
+        });
+    }
+
     // 초기로딩 or 새로고침
     useEffect(() => {
         async function run() {
@@ -61,31 +94,10 @@ export default function ServerList() {
             // setServerStatusMap({});
 
             // 서버 리스트 불러오기
-            await $.ajax({
-                url: `http://localhost:${backendport}/servercrud/get?type=serverlist`,
-                contentType: 'application/json',
-                type: 'POST',
-                success: async resp => {
-                    await setServerMap(resp);
-                },
-                error: err => {
-                    console.error(err);
-                }
-            });
+            await loadServerList();
 
             // 서버 상태 불러오기
-            await $.ajax({
-                url: `http://localhost:${backendport}/servercrud/get?type=status`,
-                contentType: 'application/json',
-                type: 'POST',
-                success: resp => {
-                    setServerStatusMap(resp);
-                    setLoading(false);
-                },
-                error: err => {
-                    console.error(err);
-                }
-            });
+            await loadServerStatus();
         }
 
         void run();
@@ -127,7 +139,14 @@ export default function ServerList() {
     // Handle server open request
     const openServer = async (serverID) => {
         if (serverStatusMap[serverID] === "offline") {
-            setServerStatusMap(prev => ({...prev, [serverID]: "pending"}));
+            await $.ajax({
+                url: `http://localhost:${backendport}/server/start?targetID=${serverID}`,
+                contentType: 'application/json',
+                type: 'POST',
+                success: async () => {
+                    await loadServerStatus();
+                }
+            });
         }
     };
 

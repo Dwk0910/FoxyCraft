@@ -3,6 +3,7 @@ package org.foxycraft;
 import org.jetbrains.annotations.NotNull;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -25,6 +26,35 @@ public class Util {
             if (!FoxyCraft.compatibleJRE.contains(reqJRE))
                 throw new IllegalArgumentException("JRE version " + reqJRE + " is not compatible.");
         }
+    }
+
+    public static JSONObject getServer(String UUID) {
+        try {
+            for (Object o : getContent("serverlist.dat", JSONArray.class)) {
+                JSONObject obj = new JSONObject(o.toString());
+                if (obj.getString("UUID").equals(UUID)) return obj;
+            }
+            return null;
+        } catch (JSONException e) {
+            FoxyCraft.logger.error(e);
+            throw new RuntimeException("The JSONException has been occured.");
+        }
+    }
+
+    public static void setServer(String UUID, JSONObject targetObject) {
+        JSONArray array = getContent("serverlist.dat", JSONArray.class);
+        JSONObject obj = getServer(UUID);
+        if (obj == null) throw new NullPointerException("The server you are looking for cannot be found. (UUID: " + UUID + ")");
+        if (!UUID.equals(obj.getString("UUID"))) throw new RuntimeException("Restricted action: Server UUID is not changeable.");
+
+        JSONArray newArray = new JSONArray();
+        for (Object o : array) {
+            JSONObject array_object = new JSONObject(o.toString());
+            if (array_object.getString("UUID").equals(obj.getString("UUID"))) {
+                newArray.put(targetObject);
+            } else newArray.put(array_object);
+        }
+        writeToFile("serverlist.dat", newArray);
     }
 
     public static <T> @NotNull T getContent(String fileName, Class<T> _class) {

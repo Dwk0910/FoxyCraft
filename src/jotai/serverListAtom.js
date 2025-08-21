@@ -15,3 +15,6 @@ export const currentServerAtom = atom(get => get(baseAtom), (get, set, args) => 
 
 export const serverMapAtom = atom({});
 export const serverStatusMapAtom = atom({});
+
+// Console Page
+export const logAtom = atom({});

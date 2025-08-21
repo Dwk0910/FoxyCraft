@@ -15,11 +15,14 @@ import org.jetbrains.annotations.NotNull;
 import org.foxycraft.FoxyCraft;
 import org.foxycraft.Util;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import java.net.URI;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,7 +31,10 @@ import java.util.UUID;
 @CrossOrigin(origins = "http://localhost:5173", methods = RequestMethod.POST)
 public class ServerController {
     public static final class WebSocketHandler extends TextWebSocketHandler {
+        public static WebSocketSession SESSION;
         public static UUID uuid;
+
+        private static final List<Thread> taskList = new ArrayList<>();
 
         public static String getUUID(URI uri) {
             String id;
@@ -40,30 +46,56 @@ public class ServerController {
             } catch (NullPointerException e) {
                 return null;
             }
-
             return id;
         }
 
         @Override
         public void afterConnectionEstablished(@NotNull WebSocketSession session) {
+            SESSION = session;
+
             try {
-                String id = getUUID(session.getUri());
+                String id = getUUID(SESSION.getUri());
                 if (id == null) {
-                    session.close(CloseStatus.BAD_DATA);
+                    SESSION.close(CloseStatus.BAD_DATA);
                     return;
                 }
 
                 uuid = UUID.fromString(id);
 
-                session.sendMessage(new TextMessage(Map.of("content", "Connection Established").toString()));
-                FoxyCraft.logger.info("Connection established : SESSION_ID: {}, UUID: {}", session.getId(), uuid.toString());
+                SESSION.sendMessage(new TextMessage(new JSONObject().put("content", "Connection Established").toString()));
+                FoxyCraft.logger.info("Connection established : UUID: {}", uuid.toString());
+
+                // 이벤트성 테스크 등록
+                taskList.add(new Thread(() -> {
+                    do {
+                        try {
+                            JSONObject receiveHeader = new JSONObject().put("page", "Console");
+                            SESSION.sendMessage(new TextMessage(Util.cloneJSONObject(receiveHeader).put("content", "a").toString()));
+                            Thread.sleep(1000);
+                            SESSION.sendMessage(new TextMessage(Util.cloneJSONObject(receiveHeader).put("content", "b").toString()));
+                            Thread.sleep(1000);
+                            SESSION.sendMessage(new TextMessage(Util.cloneJSONObject(receiveHeader).put("content", "c").toString()));
+                            Thread.sleep(1000);
+                        } catch (InterruptedException | IOException e) {
+                            FoxyCraft.logger.error(e);
+                        }
+                    } while (true);
+                }));
+
+                for (Thread t : taskList) {
+                    if (!t.isAlive()) t.start();
+                }
             } catch (IOException e) {
                 FoxyCraft.logger.error(e);
             }
         }
 
         @Override
-        public void afterConnectionClosed(WebSocketSession session, @NotNull CloseStatus status) {
+        public void afterConnectionClosed(@NotNull WebSocketSession session, @NotNull CloseStatus status) {
+            for (Thread t : taskList) {
+                t.interrupt();
+            }
+
             FoxyCraft.logger.info("[session {}] Connection endded.", session.getId());
             if (status.getReason() != null) FoxyCraft.logger.warn("with reason : {}", status.getReason());
         }

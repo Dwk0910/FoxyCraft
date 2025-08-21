@@ -114,6 +114,10 @@ public class Util {
         }
     }
 
+    public static JSONObject cloneJSONObject(JSONObject origin) {
+        return new JSONObject(origin.toString());
+    }
+
     public static boolean isUUID(String uuid) {
         try {
             UUID.fromString(uuid);

@@ -19,6 +19,7 @@ import java.nio.file.Files;
 
 import java.net.URL;
 import java.net.HttpURLConnection;
+import java.util.UUID;
 
 public class Util {
     public record RunnerInfo(URL url, String reqJRE) {
@@ -49,10 +50,10 @@ public class Util {
 
         JSONArray newArray = new JSONArray();
         for (Object o : array) {
-            JSONObject array_object = new JSONObject(o.toString());
-            if (array_object.getString("UUID").equals(obj.getString("UUID"))) {
+            JSONObject arrayObject = new JSONObject(o.toString());
+            if (arrayObject.getString("UUID").equals(obj.getString("UUID"))) {
                 newArray.put(targetObject);
-            } else newArray.put(array_object);
+            } else newArray.put(arrayObject);
         }
         writeToFile("serverlist.dat", newArray);
     }
@@ -110,6 +111,15 @@ public class Util {
             out.close();
         } catch (IOException e) {
             FoxyCraft.logger.error(e);
+        }
+    }
+
+    public static boolean isUUID(String uuid) {
+        try {
+            UUID.fromString(uuid);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 }

@@ -33,6 +33,8 @@ import { currentServerAtom, serverMapAtom, serverStatusMapAtom } from '../jotai/
 
 export default function ServerList() {
     // global
+    const [webSocket, setWebSocket] = useState(null);
+
     const backendport = localStorage.getItem('backend');
     const [ loading, setLoading ] = useState(true);
 
@@ -73,7 +75,6 @@ export default function ServerList() {
             type: 'POST',
             success: resp => {
                 setServerStatusMap(resp);
-                setLoading(false);
             },
             error: err => {
                 console.error(err);
@@ -98,6 +99,8 @@ export default function ServerList() {
 
             // 서버 상태 불러오기
             await loadServerStatus();
+
+            setLoading(false);
         }
 
         void run();
@@ -105,8 +108,26 @@ export default function ServerList() {
 
     // Server Explorer에서 서버 변경시 호출
     useEffect(() => {
-        // 기본 menu는 Console
-        if (currentServer.id) setComponent(<Console serverUUID={currentServer.id}/>);
+        // 서버를 선택하였을 시
+        if (currentServer.id) {
+            // 기본 menu Console로 설정
+            setComponent(<Console serverUUID={currentServer.id}/>);
+
+            const socket = new WebSocket(`ws://localhost:${backendport}/websocket?id=${currentServer.id}`);
+            socket.onopen = (event) => {
+                // const data = JSON.parse(event.data);
+                // console.log("Content : ", data.payload?.content);
+                console.log(event);
+            };
+
+            socket.onmessage = (event) => {
+                console.log(event);
+            };
+
+            return () => {
+                socket.close(1000);
+            };
+        }
     }, [currentServer.id]);
 
     let array = [];

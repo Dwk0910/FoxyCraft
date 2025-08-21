@@ -111,11 +111,11 @@ public class ServerCRUD {
     // Server information responses
 
     @PostMapping("/get")
-    public ResponseEntity<? extends Map<String, Object>> getServerList(@RequestParam("type") String type) {
+    public ResponseEntity<? extends Map<String, ?>> getServerList(@RequestParam("type") String type) {
         switch (type) {
             case "serverlist" -> {
                 // 각 서버의 runner가 살아있는지 확인하고 올바른 서버만 반영 배열에 추가
-                Map<String, Object> result = new HashMap<>();
+                Map<String, Map<String, Object>> result = new HashMap<>();
                 JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
                 JSONArray newArray = new JSONArray();
                 for (Object o : array) {
@@ -140,7 +140,7 @@ public class ServerCRUD {
             case "status" -> {
                 // runner array
                 JSONArray array = Util.getContent("serverlist.dat", JSONArray.class);
-                Map<String, Object> statusMap = new HashMap<>();
+                Map<String, String> statusMap = new HashMap<>();
 
                 // object내의 UUID를 key로, status를 value로 Map 만들어서 리턴
                 for (Object o : array) {

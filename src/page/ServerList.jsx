@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { ConfigProvider, Popover, theme } from "antd";
 import { motion } from 'framer-motion';
 
+import Loading from '../component/Loading';
 import AddServer from "./AddServer";
 
 // menu components
@@ -26,13 +27,15 @@ import { LuServer } from 'react-icons/lu';
 import { FaCircle } from "react-icons/fa";
 
 // store & native
+import { currentServerAtom, serverMapAtom, serverStatusMapAtom, logAtom } from '../jotai/serverListAtom';
 import { menuContext } from '../App';
 import { useState, useEffect, useContext } from 'react';
 import { useAtom } from 'jotai';
-import { currentServerAtom, serverMapAtom, serverStatusMapAtom } from '../jotai/serverListAtom';
 
 export default function ServerList() {
     // global
+    const [socket, setSocket] = useState(null);
+
     const backendport = localStorage.getItem('backend');
     const [ loading, setLoading ] = useState(true);
 
@@ -44,6 +47,7 @@ export default function ServerList() {
     const [componentOpacity, setComponentOpacity] = useState(1);
 
     // atom for each servers
+    const [ log, setLog ] = useAtom(logAtom);
     const [ currentServer, setCurrentServer ] = useAtom(currentServerAtom);
     const [ serverMap, setServerMap ] = useAtom(serverMapAtom);
     const [ serverStatusMap, setServerStatusMap ] = useAtom(serverStatusMapAtom);
@@ -73,7 +77,6 @@ export default function ServerList() {
             type: 'POST',
             success: resp => {
                 setServerStatusMap(resp);
-                setLoading(false);
             },
             error: err => {
                 console.error(err);
@@ -98,6 +101,8 @@ export default function ServerList() {
 
             // 서버 상태 불러오기
             await loadServerStatus();
+
+            setLoading(false);
         }
 
         void run();
@@ -105,8 +110,36 @@ export default function ServerList() {
 
     // Server Explorer에서 서버 변경시 호출
     useEffect(() => {
-        // 기본 menu는 Console
-        if (currentServer.id) setComponent(<Console serverUUID={currentServer.id}/>);
+
+
+        // 서버를 선택하였을 시
+        if (currentServer.id) {
+            // 서버 바꿀시 초기화
+            setLog({...log, [currentServer.id]: []});
+
+            // WebSocket 설정 (이미 있을 시 닫기)
+            const socket = new WebSocket(`ws://localhost:${backendport}/websocket?id=${currentServer.id}`);
+            socket.onopen = () => {
+                setSocket(socket);
+
+                // ** 소켓 활성화 이후 동작 **
+
+                // 기본 menu를 Console로 설정
+                setComponent(<Console serverUUID={currentServer.id} socket={socket}/>);
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                // page 데이터가 없는 전역적 명령의 경우
+                if (!data.page) console.log(data.content);
+            };
+
+            // Effect 후기동작
+            return () => {
+                setSocket(null);
+                socket.close(1000);
+            };
+        }
     }, [currentServer.id]);
 
     let array = [];
@@ -226,7 +259,7 @@ export default function ServerList() {
                     </div>
 
                     <div className={"flex flex-row ml-0.5 mt-3"}>
-                        <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('console', <Console serverUUID={currentServer.id}/>)}>로그</span>
+                        <span className={clsx(currentServer.menu === "console" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('console', <Console serverUUID={currentServer.id} socket={socket}/>)}>로그</span>
                         <span className={clsx(currentServer.menu === "player" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('player', <Player/>)}>플레이어</span>
                         <span className={clsx(currentServer.menu === "plugin" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-19 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('plugin', <Plugin/>)}>플러그인</span>
                         <span className={clsx(currentServer.menu === "mods" ? "border-t-1 pt-[7px]" : "pt-[8px]", "border-cyan-500 hover:border-cyan-200 hover:border-t-1 hover:pt-[7px] transition-colors duration-300 flex justify-center w-12 mx-0.5 font-SeoulNamsanM cursor-pointer")} onClick={() => changeComponent('mods', <Mods/>)}>모드</span>
@@ -251,6 +284,7 @@ export default function ServerList() {
 
     return (
         <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+            <Loading loadingState={ currentServer.id && socket === null }/>
             <div className={"flex flex-row"}>
                 {/*Server Explorer*/}
                 <div className={"flex flex-col bg-[#474747] border-[#636363] border-r-1 w-85 h-screen"}>

@@ -1,6 +1,4 @@
-
 export default function Backup() {
-    return (
-        <h1>Backup</h1>
-    );
+    return <h1>Backup</h1>;
 }
+

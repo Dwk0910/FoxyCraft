@@ -1,7 +1,7 @@
-
 const license = {
-    papermc: { name: "GPLv3", content:
-`
+    papermc: {
+        name: 'GPLv3',
+        content: `
 Paper inherits its licensing from the included upstream projects.
 
 As such, Paper is licensed under the GNU General Public License version 3; as it inherits it from Spigot, who in turn inherits it from the original Bukkit and CraftBukkit projects.
@@ -231,8 +231,11 @@ The hypothetical commands \`show w' and \`show c' should show the appropriate pa
 You should also get your employer (if you work as a programmer) or school, if any, to sign a "copyright disclaimer" for the program, if necessary. For more information on this, and how to apply and follow the GNU GPL, see https://www.gnu.org/licenses/.
 
 The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read https://www.gnu.org/licenses/why-not-lgpl.html.
-`},
-    mohist: { name: "GPLv3", content: `
+`,
+    },
+    mohist: {
+        name: 'GPLv3',
+        content: `
 GNU GENERAL PUBLIC LICENSE
                       Version 3, 29 June 2007
 
@@ -907,12 +910,13 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
-`}
+`,
+    },
 };
 
 export default function getRunnerLicense(runnerName) {
     return {
         name: license[runnerName]?.name,
-        content: license[runnerName]?.content
+        content: license[runnerName]?.content,
     };
-};
+}

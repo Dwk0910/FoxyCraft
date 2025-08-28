@@ -1,6 +1,4 @@
-
 export default function Plugin() {
-    return (
-        <h1>Plugin</h1>
-    );
+    return <h1>Plugin</h1>;
 }
+

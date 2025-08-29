@@ -468,16 +468,17 @@ export default function AddServer() {
                                             const conditions = formCheckList[formList[server.step].type.name]; // 2차원 배열
                                             for (const condition of conditions) {
                                                 isPassed = true;
+
                                                 // 검사
                                                 condition.forEach((item) => {
                                                     if (
                                                         item === undefined ||
                                                         item === null ||
                                                         item === '' ||
-                                                        item === false ||
-                                                        parseInt(item) === 0
-                                                    )
+                                                        item === false
+                                                    ) {
                                                         isPassed = false;
+                                                    }
                                                 });
 
                                                 // 어차피 OR게이트이므로 isPassed == true이면 더 이상 검사 할 필요가 없음

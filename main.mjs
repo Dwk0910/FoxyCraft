@@ -38,7 +38,7 @@ ipcMain.on('log', (_, { level, msg }) => {
 
 // window 생성
 let window;
-function createWindow() {
+const createWindow = () => {
     window = new BrowserWindow({
         width: 1260,
         height: 960,
@@ -59,7 +59,7 @@ function createWindow() {
         window.loadURL('http://localhost:5173').then();
         window.webContents.openDevTools();
     }
-}
+};
 
 // 올바른 백엔드 서버인지 확인하기 위해 temp폴더에 랜덤값을 적어놓은 파일 저장
 const tempFolder = join(tmpdir(), 'foxycraft');
@@ -134,16 +134,21 @@ app.on('ready', () => {
     const dataFolderPath = join(app.getPath('appData'), 'foxycraft', 'data');
     if (!existsSync(dataFolderPath)) mkdirSync(dataFolderPath);
     const datapath_argument = `-DAPP_DATA_PATH=${dataFolderPath} -DAPP_RESOURCES_PATH=${process.resourcesPath}`;
-    const datapath_argument_dev = `-PdataPath="${dataFolderPath}" -PresourcesPath="${process.resourcesPath}"`;
-    const datapath_argument_dev_darwin = [`-PdataPath=${dataFolderPath}`, `-PresourcesPath=${process.resourcesPath}`];
+    const datapath_argument_dev = `-PdataPath="${dataFolderPath}" -PresourcesPath="${path.join(__dirname, 'resources')}"`;
+    const datapath_argument_dev_darwin = [
+        `-PdataPath=${dataFolderPath}`,
+        `-PresourcesPath=${path.join(__dirname, 'resources')}`,
+    ];
+
+    console.log('datapath_arugument_dev', datapath_argument_dev);
+    console.log('datapath_arugument_dev_darwin', datapath_argument_dev_darwin);
 
     let javaExecutable = '';
 
     if (app.isPackaged) {
         if (process.platform === 'win32' && process.arch === 'x64')
             javaExecutable = join(process.resourcesPath, 'jre_win_64', 'bin', 'java.exe');
-        else if (process.platform === 'darwin')
-            javaExecutable = join(process.resourcesPath, 'jre_mac', 'Contents', 'Home', 'bin', 'java');
+        else if (process.platform === 'darwin') javaExecutable = join(process.resourcesPath, 'jre_mac', 'bin', 'java');
         else {
             // 지원하지 않는 OS/Architecture
             dialog.showMessageBoxSync({
@@ -197,7 +202,7 @@ app.on('ready', () => {
     createWindow();
 });
 
-async function shutdown() {
+const shutdown = async () => {
     try {
         return await axios
             .post(
@@ -222,7 +227,7 @@ async function shutdown() {
     } finally {
         if (javaProcess) javaProcess.kill();
     }
-}
+};
 
 let isQuitting = false; // 딱 한 번만 호출 가능하도록 설정
 app.on('before-quit', (event) => {

@@ -1,11 +1,12 @@
 import axios from 'axios';
 
+import icon from './../icon.png';
+
 import { useState, useEffect, createContext, Suspense } from 'react';
 
 import Loading from './component/Loading';
 
-// icons
-import icon from './assets/images/icon.png';
+// icons import icon from './assets/images/icon.png';
 import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { LuServer } from 'react-icons/lu';
 import { FiPlus, FiSettings } from 'react-icons/fi';

@@ -74,6 +74,6 @@ export const serverAtom = atom(
             }
         } catch (ignored) {} // undefined이면 무시
 
-        set(baseServerAtom, newServer);
+        set(baseServerAtom, { ...get(baseServerAtom), ...newServer });
     },
 );

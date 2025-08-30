@@ -43,6 +43,7 @@ public class FoxyCraft {
         File serverList = new File(dataPath + File.separator + "serverlist.dat");
         fileList.put("serverlist.dat", serverList); // serverList
 
+
         // initialize file
         if (!serverList.exists()) {
             try {

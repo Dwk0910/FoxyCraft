@@ -2,8 +2,9 @@
     "name": "foxycraft",
     "author": "neatore",
     "version": "0.0.1",
+    "type": "module",
     "description": "FoxyCraft helps you create, configure, and run your own Minecraft server with a powerful and user-friendly interface.",
-    "main": "main.js",
+    "main": "main.mjs",
     "scripts": {
         "lint": "eslint .",
         "start-react": "vite",
@@ -82,7 +83,6 @@
     },
     "keywords": [],
     "license": "Apache-2.0",
-    "type": "commonjs",
     "bugs": {
         "url": "https://github.com/Dwk0910/FoxyCraft/issues"
     },

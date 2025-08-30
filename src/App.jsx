@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import icon from './../icon.png';
+
 import { useState, useEffect, createContext, Suspense } from 'react';
 
 import Loading from './component/Loading';
